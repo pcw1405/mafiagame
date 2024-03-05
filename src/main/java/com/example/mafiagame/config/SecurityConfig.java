@@ -19,7 +19,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.formLogin()
                 .loginPage("/members/login") //로그인 페이지 url 설정
-                .defaultSuccessUrl("/") // 성공시 이동할 url
+                .defaultSuccessUrl("/members/chat") // 성공시 이동할 url
                 .usernameParameter("email") //로그인시 사용할 파라미터 이름으로 email 지정
                 .failureUrl("/members/login/error") //.로그인 실패시 이동할 url
                 .and()
