@@ -20,6 +20,7 @@ public class ChatHandler extends TextWebSocketHandler {
         String payload = message.getPayload();
         log.info("payload:" + payload);
         //페이로드란 전송되는 데이터를 의미한다
+//예를 들어 택배 배송을 보내고 받을 때 택배 물건이 페이로드고 송장이나 박스 등은 부가적은 것이기 때문에 페이로드가 아니다.
 
         for(WebSocketSession sess: list){
             sess.sendMessage(message);

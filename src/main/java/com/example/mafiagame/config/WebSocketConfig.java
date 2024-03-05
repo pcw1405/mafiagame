@@ -21,7 +21,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry){
         registry.addHandler(chatHandler,"ws/chat").setAllowedOrigins("*");
     }
-
+   // Endpoint란 API가 서버에서 자원(resource)에 접근할 수 있도록 하는 URL이다.
 
 
 }
