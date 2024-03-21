@@ -81,7 +81,7 @@
             // 게임 요청 버튼 클릭 시 이벤트
             $("#game-request").on("click", function() {
                 // 게임 요청 메시지를 상대방에게 전송
-                let message = "게임 요청";
+                let message = username + ":게임 요청";
                 websocket.send(message);
             });
 
@@ -107,7 +107,7 @@
 
 
                 // 게임 요청이 있는지 확인
-                if ( data == "게임 요청") {
+                if ( message == "게임 요청") {
                         if(sender != username){
                         // 상대방에게만 모달 창
                         console.log(" message 추출:", message);
