@@ -32,6 +32,7 @@ public class SecurityConfig {
         http.authorizeRequests() //시큐리티 처리에 HttpServletRequest를 이용한다는 의미
                 .mvcMatchers("/css/**", "/js/**", "/img/**").permitAll() //모든사용자가 로그인 없이 경로 접근
                 .mvcMatchers("/", "/members/**", "/images/**").permitAll()
+                .mvcMatchers("/chat", "/ws/chat").permitAll()
                 .mvcMatchers("/admin/**").hasRole("ADMIN")  //ADMIN Role일 경우 접근가능
                 .anyRequest().authenticated()
         ;

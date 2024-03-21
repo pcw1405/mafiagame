@@ -1,5 +1,6 @@
 package com.example.mafiagame.entity;
 
+import com.example.mafiagame.constant.Role;
 import com.example.mafiagame.dto.MemberFormDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,7 @@ import javax.persistence.*;
 @Setter
 @ToString
 @NoArgsConstructor
-public class Member {
+public class Member  extends BaseEntity {
 
     @Id
     @Column(name="member_id")
@@ -27,7 +28,8 @@ public class Member {
     @Column(unique = true) //중복값 허용안함
     private String email;
     private String password;
-
+    @Enumerated(EnumType.STRING)
+    private Role role;
     public static Member createMember(MemberFormDto memberFormDto,
                                       PasswordEncoder passwordEncoder){
         Member member = new Member();
@@ -36,6 +38,7 @@ public class Member {
 
         String password = passwordEncoder.encode(memberFormDto.getPassword());
         member.setPassword(password);
+        member.setRole(Role.ADMIN);
 
         return member;
     }

@@ -45,6 +45,7 @@ public class MemberService implements UserDetailsService {
         return User.builder()
                 .username(member.getEmail())
                 .password(member.getPassword())
+                .roles(member.getRole().toString())
                 //배열로 반환되어 문자열로 변환해서 넣어줘야함
                 .build();
     }
