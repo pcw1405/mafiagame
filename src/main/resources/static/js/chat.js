@@ -91,11 +91,11 @@ $(document).ready(function(){
                         gameAccepted = true; // 게임 수락 상태로 변경
                         $("#gameRequestModal").modal("hide"); // 모달 창 숨기기
                         $("#msgArea").hide(); // 채팅 입력 숨기기
-                        $("#gameChoices").show(); // 게임 선택 옵션 표시
+                        //$("#gameChoices").show(); // 게임 선택 옵션 표시
                         // 게임 제안자에게도 선택 창을 표시
-                        if (sender) {
-                            $("#gameChoices").show();
-                        }
+//                        if (sender) {
+//                            $("#gameChoices").show();
+//                        }
                     });
 
                     // 거절 버튼 클릭 시 이벤트
@@ -110,6 +110,8 @@ $(document).ready(function(){
                 // 게임 제안자가 가위, 바위, 보 중 하나를 선택했을 때의 처리
                 var gesture = message.split(":")[1].trim();
                 // 게임 제안자에게 선택한 제스처를 표시하거나 다른 처리를 수행
+            } else if ((message === "게임수락") {
+                    $("#gameChoices").show();
             } else {
                 // 일반 채팅 메시지 처리
                 var str = "<div class='col-6'>";
