@@ -1,14 +1,18 @@
-    function chooseGesture(gesture) {
-                    // 선택한 제스처를 서버로 전송
-                    websocket.send("게임 제스처:" + gesture);
-                    // 선택 창을 숨기고 채팅 입력을 다시 표시
-                    $("#gameChoices").hide();
-                    $("#msgArea").show();
-                }
-
-
 
 $(document).ready(function(){
+
+        $(".gesture-button").click(function(){
+            var gesture = $(this).data("gesture");
+            chooseGesture(gesture);
+        });
+
+        function chooseGesture(gesture) {
+            // 선택한 제스처를 서버로 전송
+            websocket.send(username + ": " + gesture);
+            // 선택 창을 숨기고 채팅 입력을 다시 표시
+            $("#gameChoices").hide();
+            $("#msgArea").show();
+        }
 
     let username = "";
     let gameAccepted = false;
@@ -110,8 +114,10 @@ $(document).ready(function(){
                 // 게임 제안자가 가위, 바위, 보 중 하나를 선택했을 때의 처리
                 var gesture = message.split(":")[1].trim();
                 // 게임 제안자에게 선택한 제스처를 표시하거나 다른 처리를 수행
-            } else if ((message === "게임수락") {
+            } else if (data == "게임 수락") {
                     $("#gameChoices").show();
+                        $("#msgArea").hide();
+                         gameAccepted = true
             } else {
                 // 일반 채팅 메시지 처리
                 var str = "<div class='col-6'>";
