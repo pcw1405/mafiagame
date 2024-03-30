@@ -46,6 +46,18 @@ dependencies {
 	implementation 'org.webjars:sockjs-client:1.1.2'
 	implementation 'org.webjars:stomp-websocket:2.3.3-1'
 
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation ('it.ozimov:embedded-redis:0.7.3') { exclude group: "org.slf4j", module: "slf4j-simple" }
+
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+
+// https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-core
+	implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0.1'
+
+// https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl
+	implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
 }
 
 tasks.named('test') {
