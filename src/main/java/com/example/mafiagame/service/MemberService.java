@@ -1,8 +1,11 @@
 package com.example.mafiagame.service;
 
+import com.example.mafiagame.constant.MemberNotFoundException;
 import com.example.mafiagame.entity.Member;
 import com.example.mafiagame.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,12 +16,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
 
     public Member saveMember(Member member){
-        validateDupulicateMember(member);
-        return memberRepository.save(member);
+        try {
+            validateDupulicateMember(member);
+            return memberRepository.save(member);
+        } catch (DataAccessException e) {
+            // 데이터베이스 예외 처리
+            log.error("Failed to save member: " + e.getMessage());
+            throw new MemberNotFoundException("Failed to save member", e);
+        }
     }
 
     private void validateDupulicateMember(Member member) {

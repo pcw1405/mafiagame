@@ -1,0 +1,30 @@
+spring:
+  profiles:
+    active: local
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: false
+    add-properties: false
+  jwt:
+    secret: govlepel@$&
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mafiagame?serverTimezone=UTC
+    username: root
+    password: 1234
+
+  server:
+    port: 8080
+
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+      org.hibernate.type.descriptor.sql: trace
+      database-platform: org.hibernate.dialect.MySQL8Dialect
+      jdbc:
+        time_zone: Asia/Seoul
