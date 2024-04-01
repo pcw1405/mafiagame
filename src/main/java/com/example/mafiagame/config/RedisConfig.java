@@ -18,7 +18,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 
 @RequiredArgsConstructor
 @Configuration
-@EnableWebSecurity
 public class RedisConfig {
 
     /**

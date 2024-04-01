@@ -20,7 +20,7 @@ public class SecurityConfig {
         http.
                 formLogin()
                 .loginPage("/members/login") //로그인 페이지 url 설정
-                .defaultSuccessUrl("/members/chat") // 성공시 이동할 url
+                .defaultSuccessUrl("/chat/room") // 성공시 이동할 url
                 .usernameParameter("email") //로그인시 사용할 파라미터 이름으로 email 지정
                 .failureUrl("/members/login/error") //.로그인 실패시 이동할 url
                 .and()
@@ -35,6 +35,7 @@ public class SecurityConfig {
                 .mvcMatchers("/css/**", "/js/**", "/img/**").permitAll() //모든사용자가 로그인 없이 경로 접근
                 .mvcMatchers("/", "/members/**", "/images/**").permitAll()
                 .mvcMatchers("/chat/**","/chat/room/**", "/ws/chat","/ws-stomp").permitAll()
+                .mvcMatchers( "/ws/chat/**","/ws-stomp/**").permitAll()
 //                .antMatchers("/chat/**").hasRole("ADMIN")
                 .mvcMatchers("/admin/**").hasRole("ADMIN")  //ADMIN Role일 경우 접근가능
                 .anyRequest().authenticated()

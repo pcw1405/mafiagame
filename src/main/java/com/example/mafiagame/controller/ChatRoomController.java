@@ -28,6 +28,10 @@ public class ChatRoomController {
 
     @GetMapping("/room")
     public String rooms() {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName(); // 사용자 이름 가져오기
+        log.info("현재 사용자: {}", username);
         return "/chat/room";
     }
 

@@ -4,6 +4,11 @@
     <title>Websocket Chat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- CSRF 토큰을 메타데이터로 포함시킵니다. -->
+    <meta name="_csrf" content="YOUR_CSRF_TOKEN_HERE">
+    <!-- CSRF 토큰을 헤더 이름으로 지정합니다. -->
+    <meta name="_csrf_header" content="X-CSRF-TOKEN">
+
     <!-- CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <style>
@@ -66,6 +71,7 @@
                     } else {
                         var params = new URLSearchParams();
                         params.append("name",this.room_name);
+                        console.log("Room Name:", this.room_name);
                         axios.post('/chat/room', params)
                         .then(
                             response => {
