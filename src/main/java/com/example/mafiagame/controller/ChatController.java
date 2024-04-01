@@ -26,7 +26,7 @@ public class ChatController {
     private final ChannelTopic channelTopic;
 
 
-    @MessageMapping("/templates/chat/message")
+    @MessageMapping("/chat/message")
     public void message(ChatMessage message, @Header("token") String token) {
         String nickname = jwtTokenProvider.getUserNameFromJwt(token);
         // 로그인 회원 정보로 대화명 설정

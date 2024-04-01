@@ -6,6 +6,8 @@ import com.example.mafiagame.repository.ChatRoomRepository;
 import com.example.mafiagame.service.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -37,10 +39,20 @@ public class ChatRoomController {
 
     @PostMapping("/room")
     @ResponseBody
-    public ChatRoom createRoom(@RequestParam String name) {
-        return chatRoomRepository.createChatRoom(name);
+    public ResponseEntity<?> createRoom(@RequestParam(required = true) String name) {
+        try {
+            log.info("채팅방 생성 요청 받음 - 이름: {}", name);
+            ChatRoom chatRoom = chatRoomRepository.createChatRoom(name);
+            return ResponseEntity.ok(chatRoom);
+        } catch (IllegalArgumentException ex) {
+            // 이름 파라미터가 누락된 경우
+            return ResponseEntity.badRequest().body("이름 파라미터가 누락되었습니다.");
+        } catch (Exception ex) {
+            // 채팅방 생성 실패나 다른 예외 상황에 대한 처리
+            log.error("채팅방 생성 실패.", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("채팅방 생성에 실패하였습니다.");
+        }
     }
-
     @GetMapping("/room/enter/{roomId}")
     public String roomDetail(Model model, @PathVariable String roomId) {
         model.addAttribute("roomId", roomId);
