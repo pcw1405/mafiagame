@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <title>Websocket Chat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <!-- CSRF 토큰을 메타데이터로 포함시킵니다. -->
-    <meta name="_csrf" content="YOUR_CSRF_TOKEN_HERE">
-    <!-- CSRF 토큰을 헤더 이름으로 지정합니다. -->
-    <meta name="_csrf_header" content="X-CSRF-TOKEN">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
     <!-- CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -50,46 +50,52 @@
 <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
 <script>
-        var vm = new Vue({
-            el: '#app',
-            data: {
-                room_name : '',
-                chatrooms: [
-                ]
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            room_name: '',
+            chatrooms: []
+        },
+        created() {
+            this.findAllRoom();
+        },
+        methods: {
+            findAllRoom: function () {
+                axios.get('/chat/rooms').then(response => {
+                    this.chatrooms = response.data;
+                });
             },
-            created() {
-                this.findAllRoom();
-            },
-            methods: {
-                findAllRoom: function() {
-                    axios.get('/chat/rooms').then(response => { this.chatrooms = response.data; });
-                },
-                createRoom: function() {
-                    if("" === this.room_name) {
-                        alert("방 제목을 입력해 주십시요.");
-                        return;
-                    } else {
-                        var params = new URLSearchParams();
-                        params.append("name",this.room_name);
-                        console.log("Room Name:", this.room_name);
-                        axios.post('/chat/room', params)
+            createRoom: function () {
+                if ("" === this.room_name) {
+                    alert("방 제목을 입력해 주십시요.");
+                    return;
+                } else {
+                    var params = new URLSearchParams();
+                    params.append("name", this.room_name);
+                    // Set CSRF token in request header
+                    axios.defaults.headers.common[header] = token;
+                    axios.post('/chat/room', params)
                         .then(
                             response => {
-                                alert(response.data.name+"방 개설에 성공하였습니다.")
+                                alert(response.data.name + "방 개설에 성공하였습니다.")
                                 this.room_name = '';
                                 this.findAllRoom();
                             }
                         )
-                        .catch( response => { alert("채팅방 개설에 실패하였습니다."); } );
-                    }
-                },
-                enterRoom: function(roomId, roomName) {
-                    localStorage.setItem('wschat.roomId',roomId);
-                    localStorage.setItem('wschat.roomName',roomName);
-                    location.href="/chat/room/enter/"+roomId;
+                        .catch(response => {
+                            alert("채팅방 개설에 실패하였습니다.");
+                        });
                 }
+            },
+            enterRoom: function (roomId, roomName) {
+                localStorage.setItem('wschat.roomId', roomId);
+                localStorage.setItem('wschat.roomName', roomName);
+                location.href = "/chat/room/enter/" + roomId;
             }
-        });
-    </script>
+        }
+    });
+</script>
 </body>
 </html>
