@@ -18,7 +18,7 @@
 <div class="container" id="app" v-cloak>
     <div class="row">
         <div class="col-md-6">
-            <h4>{{roomName}}  <span class="badge badge-info badge-pill">{{item.userCount}}</span> </h4>
+            <h4>{{roomName}}  <span class="badge badge-info badge-pill">{{userCount}}</span> </h4>
 
         </div>
         <div class="col-md-6 text-right">
@@ -52,7 +52,7 @@
         // websocket & stomp initialize
         var sock = new SockJS("/ws-stomp");
         var ws = Stomp.over(sock);
-        var reconnect = 0;
+//        var reconnect = 0;
         // vue.js
         var vm = new Vue({
             el: '#app',
