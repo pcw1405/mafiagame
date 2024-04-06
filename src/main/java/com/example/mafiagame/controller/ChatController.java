@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Slf4j
 public class ChatController {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+//    private final RedisTemplate<String, Object> redisTemplate;
     private final JwtTokenProvider jwtTokenProvider;
-    private final ChannelTopic channelTopic;
+//    private final ChannelTopic channelTopic;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
 

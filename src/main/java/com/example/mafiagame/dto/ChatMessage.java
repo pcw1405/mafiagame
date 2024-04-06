@@ -19,6 +19,8 @@ public class ChatMessage {
         this.type=type;
         this.roomId=roomId;
         this.sender=sender;
+        this.message=message;
+        this.userCount=userCount;
     }
 
     private MessageType type;
