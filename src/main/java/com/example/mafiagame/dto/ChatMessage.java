@@ -1,5 +1,6 @@
 package com.example.mafiagame.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,11 +11,21 @@ import lombok.ToString;
 public class ChatMessage {
 
     public enum MessageType{
-        ENTER,TALK
+        ENTER,QUIT,TALK
     }
+
+    @Builder
+    public ChatMessage(MessageType type,String roomId,String sender,String message,long userCount){
+        this.type=type;
+        this.roomId=roomId;
+        this.sender=sender;
+    }
+
     private MessageType type;
     private String roomId; //방번호
     private String sender; // 메시지 보낸 사람
     private String message; // 메시지
+    private long userCount;
+
 
 }
