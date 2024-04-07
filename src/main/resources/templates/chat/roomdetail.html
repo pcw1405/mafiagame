@@ -24,6 +24,7 @@
         <div class="col-md-6 text-right">
             <a class="btn btn-primary btn-sm" href="/logout">로그아웃</a>
             <a class="btn btn-info btn-sm" href="/chat/room">채팅방 나가기</a>
+            <button class="btn btn-success" @click="sendGameRequest">가위바위보 게임 시작하기</button>
         </div>
     </div>
     <div class="input-group">
@@ -41,6 +42,27 @@
         </li>
     </ul>
 </div>
+
+<div class="modal fade" id="gameRequestModal" tabindex="-1" role="dialog" aria-labelledby="gameRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gameRequestModalLabel">게임 요청</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                상대방이 가위바위보 게임을 시작하길 원합니다. 수락하시겠습니까?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">거절</button>
+                <button type="button" class="btn btn-primary" id="acceptGameRequestBtn">수락</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- JavaScript -->
 <script src="http://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -87,9 +109,32 @@
                     ws.send("/pub/chat/message", {"token":this.token}, JSON.stringify({type:type, roomId:this.roomId, message:this.message}));
                     this.message = '';
                 },
+                 sendGameRequest: function() {
+                    // 게임 요청 메시지를 전송합니다.
+                    ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
+                        type: 'GAME_REQUEST',
+                        roomId: this.roomId,
+                        message: '상대방에게 가위바위보 게임을 요청합니다.'
+                    }));
+                },
+                acceptGameRequest: function() {
+                    // 게임 요청 수락 메시지를 전송합니다.
+                    ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
+                        type: 'GAME_REQUEST_ACCEPT',
+                        roomId: this.roomId,
+                        message: '가위바위보 게임을 수락합니다.'
+                    }));
+
+                    // 게임 요청 모달을 닫습니다.
+                    $('#gameRequestModal').modal('hide');
+                },
                 recvMessage: function(recv) {
                     this.userCount=recv.userCount;
                     this.messages.unshift({"type":recv.type,"sender":recv.sender,"message":recv.message})
+
+                    if (recv.type === 'GAME_REQUEST') {
+                        $('#gameRequestModal').modal('show');
+                    }
                 }
             }
         });
