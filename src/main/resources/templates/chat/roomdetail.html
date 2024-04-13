@@ -1,17 +1,53 @@
 <!doctype html>
-<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
     <title>Websocket ChatRoom</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <style>
-      [v-cloak] {
-          display: none;
-      }
+        [v-cloak] {
+            display: none;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        @keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
     </style>
 </head>
 <body>
@@ -19,7 +55,6 @@
     <div class="row">
         <div class="col-md-6">
             <h4>{{roomName}}  <span class="badge badge-info badge-pill">{{userCount}}</span> </h4>
-
         </div>
         <div class="col-md-6 text-right">
             <a class="btn btn-primary btn-sm" href="/logout">로그아웃</a>
@@ -31,7 +66,7 @@
         <div class="input-group-prepend">
             <label class="input-group-text">내용</label>
         </div>
-        <input type="text" class="form-control" v-model="message" v-on:keypress.enter="sendMessage('TALK')">
+        <input type="text" class="form-control" v-model="message" @keypress.enter="sendMessage('TALK')">
         <div class="input-group-append">
             <button class="btn btn-primary" type="button" @click="sendMessage('TALK')">보내기</button>
         </div>
@@ -42,107 +77,97 @@
         </li>
     </ul>
 
-    <div id="gameRequestModal" class="modal fade" :class="{ 'show': showModal }" tabindex="-1" role="dialog" aria-labelledby="gameRequestModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="gameRequestModalLabel">게임 요청</h5>
-                    <button type="button" class="close" @click="closeModal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    상대방이 가위바위보 게임을 시작하길 원합니다. 수락하시겠습니까?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @click="rejectGameRequest">거절</button>
-                    <button type="button" class="btn btn-primary" @click="acceptGameRequest">수락</button>
-                </div>
-            </div>
+    <!-- 모달 컴포넌트 -->
+    <div id="gameRequestModal" class="modal" :style="{display: showModal ? 'block' : 'none'}">
+        <div class="modal-content">
+            <span class="close" @click="closeModal">&times;</span>
+            <h2>게임 요청</h2>
+            <p>상대방이 가위바위보 게임을 시작하길 원합니다. 수락하시겠습니까?</p>
+            <button type="button" @click="acceptGameRequest">수락</button>
         </div>
     </div>
 </div>
 
 <!-- JavaScript -->
-<script src="http://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script>
-        // websocket & stomp initialize
-        var sock = new SockJS("/ws-stomp");
-        var ws = Stomp.over(sock);
-//        var reconnect = 0;
-        // vue.js
-        var vm = new Vue({
-            el: '#app',
-            data: {
-                roomId: '',
-                roomName: '',
-                message: '',
-                messages: [],
-                token: '',
-                userCount: 0,
-                showModal: false // 모달 상태를 저장하는 변수 추가
-            },
-            created() {
-                this.roomId = localStorage.getItem('wschat.roomId');
-                this.roomName = localStorage.getItem('wschat.roomName');
-                var _this = this;
-                axios.get('/chat/user').then(response => {
-                    _this.token = response.data.token;
-                    ws.connect({"token":_this.token}, function(frame) {
-                        ws.subscribe("/sub/chat/room/"+_this.roomId, function(message) {
-                            var recv = JSON.parse(message.body);
-                            _this.recvMessage(recv);
-                        });
+    // websocket & stomp initialize
+    var sock = new SockJS("/ws-stomp");
+    var ws = Stomp.over(sock);
 
-                    }, function(error) {
-                        alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.");
-                        location.href="/chat/room";
+    // vue.js
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            roomId: '',
+            roomName: '',
+            message: '',
+            messages: [],
+            token: '',
+            userCount: 0,
+            showModal: false // 모달 상태를 저장하는 변수 추가
+        },
+        created() {
+            this.roomId = localStorage.getItem('wschat.roomId');
+            this.roomName = localStorage.getItem('wschat.roomName');
+            var _this = this;
+            axios.get('/chat/user').then(response => {
+                _this.token = response.data.token;
+                ws.connect({"token": _this.token}, function(frame) {
+                    ws.subscribe("/sub/chat/room/" + _this.roomId, function(message) {
+                        var recv = JSON.parse(message.body);
+                        _this.recvMessage(recv);
                     });
+
+                }, function(error) {
+                    alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.");
+                    location.href = "/chat/room";
                 });
+            });
+        },
+        methods: {
+            sendMessage: function(type) {
+                ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({type: type, roomId: this.roomId, message: this.message}));
+                this.message = '';
             },
-            methods: {
-                sendMessage: function(type) {
-                    ws.send("/pub/chat/message", {"token":this.token}, JSON.stringify({type:type, roomId:this.roomId, message:this.message}));
-                    this.message = '';
-                },
-                 sendGameRequest: function() {
-                    // 게임 요청 메시지를 전송합니다.
-                    ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
-                        type: 'GAME_REQUEST',
-                        roomId: this.roomId,
-                        message: '상대방에게 가위바위보 게임을 요청합니다.'
-                    }));
-                },
-                acceptGameRequest: function() {
-                    // 게임 요청 수락 메시지를 전송합니다.
-                    ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
-                        type: 'GAME_REQUEST_ACCEPT',
-                        roomId: this.roomId,
-                        message: '가위바위보 게임을 수락합니다.'
-                    }));
+            sendGameRequest: function() {
+                // 게임 요청 메시지를 전송합니다.
+                ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
+                    type: 'GAME_REQUEST',
+                    roomId: this.roomId,
+                    message: '상대방에게 가위바위보 게임을 요청합니다.'
+                }));
+            },
+            acceptGameRequest: function() {
+                // 게임 요청 수락 메시지를 전송합니다.
+                ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
+                    type: 'GAME_REQUEST_ACCEPT',
+                    roomId: this.roomId,
+                    message: '가위바위보 게임을 수락합니다.'
+                }));
 
-                    // 게임 요청 모달을 닫습니다.
-                    $('#gameRequestModal').modal('hide');
-                },
-                recvMessage: function(recv) {
-                    this.userCount=recv.userCount;
-                    this.messages.unshift({"type":recv.type,"sender":recv.sender,"message":recv.message})
+                // 게임 요청 모달을 닫습니다.
+                this.showModal = false;
+            },
+            closeModal: function() {
+                // 모달 닫기 버튼 클릭 시 모달 상태를 변경합니다.
+                this.showModal = false;
+            },
+            recvMessage: function(recv) {
+                this.userCount = recv.userCount;
+                this.messages.unshift({"type": recv.type, "sender": recv.sender, "message": recv.message})
 
-                    if (recv.type == 'GAME_REQUEST') {
-                        console.log('게임 요청을 받았습니다. 모달을 엽니다');
-                        console.log(this.showModal);
-                         this.showModal = true;
-                    }
+                if (recv.type == 'GAME_REQUEST') {
+                    console.log('게임 요청을 받았습니다. 모달을 엽니다');
+                    this.showModal = true;
                 }
             }
+        }
 
-        });
-    </script>
+    });
+</script>
 </body>
 </html>
