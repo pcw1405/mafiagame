@@ -41,23 +41,23 @@
             {{message.sender}} - {{message.message}}</a>
         </li>
     </ul>
-</div>
 
-<div id="gameRequestModal" class="modal fade" :class="{ 'show': showModal }" tabindex="-1" role="dialog" aria-labelledby="gameRequestModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="gameRequestModalLabel">게임 요청</h5>
-                <button type="button" class="close" @click="closeModal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                상대방이 가위바위보 게임을 시작하길 원합니다. 수락하시겠습니까?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" @click="rejectGameRequest">거절</button>
-                <button type="button" class="btn btn-primary" @click="acceptGameRequest">수락</button>
+    <div id="gameRequestModal" class="modal fade" :class="{ 'show': showModal }" tabindex="-1" role="dialog" aria-labelledby="gameRequestModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="gameRequestModalLabel">게임 요청</h5>
+                    <button type="button" class="close" @click="closeModal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    상대방이 가위바위보 게임을 시작하길 원합니다. 수락하시겠습니까?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="rejectGameRequest">거절</button>
+                    <button type="button" class="btn btn-primary" @click="acceptGameRequest">수락</button>
+                </div>
             </div>
         </div>
     </div>
@@ -70,6 +70,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
 <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
         // websocket & stomp initialize
         var sock = new SockJS("/ws-stomp");
@@ -133,12 +134,14 @@
                     this.userCount=recv.userCount;
                     this.messages.unshift({"type":recv.type,"sender":recv.sender,"message":recv.message})
 
-                if (recv.type === 'GAME_REQUEST') {
-                    console.log('게임 요청을 받았습니다. 모달을 엽니다');
-                    this.showModal = true; // 모달을 엽니다.
+                    if (recv.type == 'GAME_REQUEST') {
+                        console.log('게임 요청을 받았습니다. 모달을 엽니다');
+                        console.log(this.showModal);
+                         this.showModal = true;
                     }
                 }
             }
+
         });
     </script>
 </body>
