@@ -43,12 +43,12 @@
     </ul>
 </div>
 
-<div class="modal fade" id="gameRequestModal" tabindex="-1" role="dialog" aria-labelledby="gameRequestModalLabel" aria-hidden="true">
+<div id="gameRequestModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="gameRequestModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="gameRequestModalLabel">게임 요청</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" @click="closeModal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -56,8 +56,8 @@
                 상대방이 가위바위보 게임을 시작하길 원합니다. 수락하시겠습니까?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">거절</button>
-                <button type="button" class="btn btn-primary" id="acceptGameRequestBtn">수락</button>
+                <button type="button" class="btn btn-secondary" @click="rejectGameRequest">거절</button>
+                <button type="button" class="btn btn-primary" @click="acceptGameRequest">수락</button>
             </div>
         </div>
     </div>
@@ -84,7 +84,8 @@
                 message: '',
                 messages: [],
                 token: '',
-                userCount: 0
+                userCount: 0,
+                showModal: false // 모달 상태를 저장하는 변수 추가
             },
             created() {
                 this.roomId = localStorage.getItem('wschat.roomId');
@@ -133,7 +134,8 @@
                     this.messages.unshift({"type":recv.type,"sender":recv.sender,"message":recv.message})
 
                     if (recv.type === 'GAME_REQUEST') {
-                        $('#gameRequestModal').modal('show');
+
+                        this.showModal = true; // 모달을 엽니다.
                     }
                 }
             }
