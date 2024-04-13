@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <head>
     <title>Websocket ChatRoom</title>
     <!-- Required meta tags -->
@@ -43,7 +43,7 @@
     </ul>
 </div>
 
-<div id="gameRequestModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="gameRequestModalLabel" aria-hidden="true">
+<div id="gameRequestModal" class="modal fade" :class="{ 'show': showModal }" tabindex="-1" role="dialog" aria-labelledby="gameRequestModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -133,9 +133,9 @@
                     this.userCount=recv.userCount;
                     this.messages.unshift({"type":recv.type,"sender":recv.sender,"message":recv.message})
 
-                    if (recv.type === 'GAME_REQUEST') {
-
-                        this.showModal = true; // 모달을 엽니다.
+                if (recv.type === 'GAME_REQUEST') {
+                    console.log('게임 요청을 받았습니다. 모달을 엽니다');
+                    this.showModal = true; // 모달을 엽니다.
                     }
                 }
             }
