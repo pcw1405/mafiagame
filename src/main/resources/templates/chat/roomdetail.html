@@ -109,12 +109,14 @@
             token: '',
             userCount: 0,
             showModal: false // 모달 상태를 저장하는 변수 추가
+            ,userName:{}
         },
         created() {
             this.roomId = localStorage.getItem('wschat.roomId');
             this.roomName = localStorage.getItem('wschat.roomName');
             var _this = this;
             axios.get('/chat/user').then(response => {
+                _this.userName = response.data.name;
                 _this.token = response.data.token;
                 ws.connect({"token": _this.token}, function(frame) {
                     ws.subscribe("/sub/chat/room/" + _this.roomId, function(message) {
@@ -162,7 +164,19 @@
 
                 if (recv.type == 'GAME_REQUEST') {
                     console.log('게임 요청을 받았습니다. 모달을 엽니다');
-                    this.showModal = true;
+                    console.log(this.userName);
+
+                    console.log(recv.message);
+                     const messageParts = recv.message.split('-'); // '-'를 기준으로 분할
+                     console.log(messageParts[1]);
+                     const senderName = messageParts[1].split(' ');
+                    console.log(senderName);
+
+                    if(this.userName!=senderName){
+                        this.showModal = true;
+                    }
+
+                    console.log(this.showModal);
                 }
             }
         }
