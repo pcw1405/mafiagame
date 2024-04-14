@@ -36,7 +36,11 @@ public class ChatService {
         }else  if (chatMessage.getType().equals(ChatMessage.MessageType.GAME_REQUEST)) {
             chatMessage.setMessage(chatMessage.getSender()+"님의 게임요청");
             chatMessage.setSender("[시스템]");
+        }else if (chatMessage.getType().equals(ChatMessage.MessageType.GAME_REQUEST_ACCEPT)){
+            chatMessage.setMessage(chatMessage.getSender()+"님이 게임요청을 수락했습니다");
+            chatMessage.setSender("[시스템]");
         }
+            //GAME_REQUEST_ACCEPT
         redisTemplate.convertAndSend(channelTopic.getTopic(),chatMessage);
     }
 

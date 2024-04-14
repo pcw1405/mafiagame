@@ -82,14 +82,20 @@
         <div class="modal-content">
             <span class="close" @click="closeModal">&times;</span>
             <h2>게임 요청</h2>
-            <div class="ifNotSender" v-if="userName !== getSenderName() && showModal">
+            <div class="ifNotSender" v-if="userName !== getSenderName() && showModal&& !showSelect" >
                 <p>상대방이 가위바위보 게임을 시작하길 원합니다. 수락하시겠습니까?</p>
                 <button type="button" @click="acceptGameRequest">수락</button>
             </div>
+            <div class="ifNotSender" v-if="userName == getSenderName() && !showSelect">
+                <p>상대방의 수락을 기다리는 중 ...</p>
+            </div>
 
-            <button type="button" class="btn btn-primary" @click="sendGameResponse('ROCK')">가위</button>
-            <button type="button" class="btn btn-primary" @click="sendGameResponse('PAPER')">바위</button>
-            <button type="button" class="btn btn-primary" @click="sendGameResponse('SCISSORS')">보</button>
+            <div class="ifGameStart" v-if="showSelect">
+                <button type="button" class="btn btn-primary" @click="sendGameResponse('ROCK')">가위</button>
+                <button type="button" class="btn btn-primary" @click="sendGameResponse('PAPER')">바위</button>
+                <button type="button" class="btn btn-primary" @click="sendGameResponse('SCISSORS')">보</button>
+            </div>
+
         </div>
     </div>
 </div>
@@ -114,8 +120,9 @@
             messages: [],
             token: '',
             userCount: 0,
-            showModal: false // 모달 상태를 저장하는 변수 추가
-            ,userName:{}
+            showModal: false, // 모달 상태를 저장하는 변수 추가
+            showSelect: false,
+            userName:{}
         },
         created() {
             this.roomId = localStorage.getItem('wschat.roomId');
@@ -158,7 +165,7 @@
                 }));
 
                 // 게임 요청 모달을 닫습니다.
-                this.showModal = false;
+                //this.showModal = false;
             },
             closeModal: function() {
                 // 모달 닫기 버튼 클릭 시 모달 상태를 변경합니다.
@@ -195,6 +202,13 @@
 
                     console.log(this.showModal);
                 }
+
+                if (recv.type == 'GAME_REQUEST_ACCEPT') {
+                    console.log('게임을 수락했습니다 받았습니다. 가위바위보를 선택합니다.')
+                    this.showSelect = true;
+
+                }
+
             }
         }
 
