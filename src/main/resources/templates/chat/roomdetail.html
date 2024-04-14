@@ -167,9 +167,9 @@
                     console.log(this.userName);
 
                     console.log(recv.message);
-                     const messageParts = recv.message.split('-'); // '-'를 기준으로 분할
-                     console.log(messageParts[1]);
-                     const senderName = messageParts[1].split(' ');
+                     const messageParts = recv.message.split('님'); // '-'를 기준으로 분할
+                     console.log(messageParts[0]);
+                     const senderName = messageParts[0];
                     console.log(senderName);
 
                     if(this.userName!=senderName){
