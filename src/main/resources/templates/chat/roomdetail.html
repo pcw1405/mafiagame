@@ -82,8 +82,14 @@
         <div class="modal-content">
             <span class="close" @click="closeModal">&times;</span>
             <h2>게임 요청</h2>
-            <p>상대방이 가위바위보 게임을 시작하길 원합니다. 수락하시겠습니까?</p>
-            <button type="button" @click="acceptGameRequest">수락</button>
+            <div class="ifNotSender" v-if="userName !== getSenderName() && showModal">
+                <p>상대방이 가위바위보 게임을 시작하길 원합니다. 수락하시겠습니까?</p>
+                <button type="button" @click="acceptGameRequest">수락</button>
+            </div>
+
+            <button type="button" class="btn btn-primary" @click="sendGameResponse('ROCK')">가위</button>
+            <button type="button" class="btn btn-primary" @click="sendGameResponse('PAPER')">바위</button>
+            <button type="button" class="btn btn-primary" @click="sendGameResponse('SCISSORS')">보</button>
         </div>
     </div>
 </div>
@@ -158,6 +164,16 @@
                 // 모달 닫기 버튼 클릭 시 모달 상태를 변경합니다.
                 this.showModal = false;
             },
+                getSenderName() {
+
+                if (this.messages.length > 0 && this.messages[0].sender) {
+                    const messageParts = this.messages[0].message.split('님');
+                    if (messageParts.length > 0) {
+                        return messageParts[0];
+                    }
+                }
+                return '';
+            },
             recvMessage: function(recv) {
                 this.userCount = recv.userCount;
                 this.messages.unshift({"type": recv.type, "sender": recv.sender, "message": recv.message})
@@ -167,14 +183,15 @@
                     console.log(this.userName);
 
                     console.log(recv.message);
-                     const messageParts = recv.message.split('님'); // '-'를 기준으로 분할
-                     console.log(messageParts[0]);
-                     const senderName = messageParts[0];
+                    const messageParts = recv.message.split('님'); // '-'를 기준으로 분할
+                    console.log(messageParts[0]);
+                    const senderName = messageParts[0];
                     console.log(senderName);
 
                     if(this.userName!=senderName){
-                        this.showModal = true;
+
                     }
+                    this.showModal = true;
 
                     console.log(this.showModal);
                 }
