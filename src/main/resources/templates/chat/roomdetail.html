@@ -80,11 +80,11 @@
     <!-- 모달 컴포넌트 -->
     <div id="gameRequestModal" class="modal" :style="{display: showModal ? 'block' : 'none'}">
         <div class="modal-content">
-            <span class="close" @click="closeModal">&times;</span>
             <h2>게임 요청</h2>
             <div class="ifNotSender" v-if="userName !== getSenderName() && showModal&& !showSelect" >
                 <p>상대방이 가위바위보 게임을 시작하길 원합니다. 수락하시겠습니까?</p>
                 <button type="button" @click="acceptGameRequest">수락</button>
+                <button type="button" class="close" @click="rejectGameRequest">거절</button>
             </div>
             <div class="ifNotSender" v-if="userName == getSenderName() && !showSelect">
                 <p>상대방의 수락을 기다리는 중 ...</p>
@@ -167,9 +167,15 @@
                 // 게임 요청 모달을 닫습니다.
                 //this.showModal = false;
             },
-            closeModal: function() {
+            rejectGameRequest: function() {
                 // 모달 닫기 버튼 클릭 시 모달 상태를 변경합니다.
+                 ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
+                    type: 'GAME_REQUEST_REJECT',
+                    roomId: this.roomId,
+                    message: '가위바위보 게임을 거절합니다.'
+                }));
                 this.showModal = false;
+
             },
                 getSenderName() {
 
@@ -206,6 +212,11 @@
                 if (recv.type == 'GAME_REQUEST_ACCEPT') {
                     console.log('게임을 수락했습니다 받았습니다. 가위바위보를 선택합니다.')
                     this.showSelect = true;
+
+                }
+                if (recv.type == 'GAME_REQUEST_REJECT') {
+                    console.log('게임요청을 거절했습니다.')
+                    this.showModal = false;
 
                 }
 
