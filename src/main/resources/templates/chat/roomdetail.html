@@ -161,7 +161,7 @@
                 }));
 
                 requester=this.userName;
-                console.log(requester);
+                console.log("게임요청자는",requester,"입니다");
             },
             acceptGameRequest: function() {
                 // 게임 요청 수락 메시지를 전송합니다.
@@ -174,7 +174,7 @@
 
                 // 게임 요청 모달을 닫습니다.
                 //this.showModal = false;
-                console.log("게임요청자:",requester);
+                console.log("게임요청자:",this.requester);
             },
             rejectGameRequest: function() {
                 // 모달 닫기 버튼 클릭 시 모달 상태를 변경합니다.
