@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -44,19 +45,25 @@ public class ChatController {
         chatService.sendChatMessage(message);
     }
 
-    @MessageMapping("/chat/message")
-    public void miniGame(ChatMessage message, @Header("token") String token) {
+    @MessageMapping("/chat/miniGame")
+    public void miniGame(ChatMessage message, @Header("token") String token,@Header("requester") String requester) {
         String nickname = jwtTokenProvider.getUserNameFromJwt(token);
         // 로그인 회원 정보로 대화명 설정
         message.setSender(nickname);
         // 채팅방 인원수 세팅
         message.setUserCount(chatRoomRepository.getUserCount(message.getRoomId()));
-
+        String gameMaker=requester;
         // 채팅방 입장시에는 대화명과 메시지를 자동으로 세팅한다.
 
         // Websocket에 발행된 메시지를 redis로 발행(publish)
 //        redisTemplate.convertAndSend(channelTopic.getTopic(), message);
-        chatService.sendChatMessage(message);
+        if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST_ACCEPT)){
+            chatService.sendChatMessage(message,gameMaker);
+
+        }else{
+            chatService.sendChatMessage(message);
+        }
+
     }
 
 //    @GetMapping("/templates/chat/user")

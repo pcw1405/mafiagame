@@ -123,7 +123,9 @@
             userCount: 0,
             showModal: false, // 모달 상태를 저장하는 변수 추가
             showSelect: false,
-            userName:{}
+            userName:{},
+            requester:{}
+
         },
         created() {
             this.roomId = localStorage.getItem('wschat.roomId');
@@ -154,19 +156,25 @@
                 ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
                     type: 'GAME_REQUEST',
                     roomId: this.roomId,
-                    message: '상대방에게 가위바위보 게임을 요청합니다.'
+                    message: '상대방에게 가위바위보 게임을 요청합니다.',
+
                 }));
+
+                requester=this.userName;
+                console.log(requester);
             },
             acceptGameRequest: function() {
                 // 게임 요청 수락 메시지를 전송합니다.
-                ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
+                ws.send("/pub/chat/miniGame", {"token": this.token}, JSON.stringify({
                     type: 'GAME_REQUEST_ACCEPT',
                     roomId: this.roomId,
-                    message: '가위바위보 게임을 수락합니다.'
+                    message: '가위바위보 게임을 수락합니다.',
+                    requester: this.requester
                 }));
 
                 // 게임 요청 모달을 닫습니다.
                 //this.showModal = false;
+                console.log("게임요청자:",requester);
             },
             rejectGameRequest: function() {
                 // 모달 닫기 버튼 클릭 시 모달 상태를 변경합니다.
