@@ -167,11 +167,15 @@
             },
             acceptGameRequest: function() {
                 // 게임 요청 수락 메시지를 전송합니다.
-                ws.send("/pub/chat/miniGame", {"token": this.token}, JSON.stringify({
+                ws.send("/pub/chat/miniGame", {
+                    "token": this.token,
+                     "requester": this.requester
+                },
+
+                JSON.stringify({
                     type: 'GAME_REQUEST_ACCEPT',
                     roomId: this.roomId,
-                    message: '가위바위보 게임을 수락합니다.',
-                    requester: this.requester
+                    message: '가위바위보 게임을 수락합니다.'
                 }));
 
                 // 게임 요청 모달을 닫습니다.
@@ -215,6 +219,7 @@
                     if(this.userName!=senderName){
 
                     }
+                    this.requester=senderName;
                     this.showModal = true;
 
                     console.log(this.showModal);
