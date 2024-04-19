@@ -53,8 +53,9 @@ public class ChatController {
         // 채팅방 인원수 세팅
         message.setUserCount(chatRoomRepository.getUserCount(message.getRoomId()));
         String gameMaker=requester;
-        log.info("게임요청자는",requester);
-        log.info("게임수락한 사람은",nickname);
+        log.info("requester: {}", requester);
+        log.info("requester1: {}", gameMaker);
+        log.info("nickname: {}", nickname);
         // 채팅방 입장시에는 대화명과 메시지를 자동으로 세팅한다.
 
         // Websocket에 발행된 메시지를 redis로 발행(publish)
@@ -62,7 +63,11 @@ public class ChatController {
         if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST_ACCEPT)){
             chatService.sendChatMessage(message,gameMaker);
 
-        }else{
+        } else if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST)){
+            chatService.sendChatMessage(message,gameMaker);
+        }
+
+        else {
             chatService.sendChatMessage(message);
         }
 

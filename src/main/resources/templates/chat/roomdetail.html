@@ -153,14 +153,16 @@
             },
             sendGameRequest: function() {
                 // 게임 요청 메시지를 전송합니다.
-                ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
+                requester=this.userName;
+                 console.log("게임요청자는",requester,"입니다");
+               ws.send("/pub/chat/miniGame", {
+                    "token": this.token,
+                    "requester": this.userName
+                }, JSON.stringify({
                     type: 'GAME_REQUEST',
                     roomId: this.roomId,
-                    message: '상대방에게 가위바위보 게임을 요청합니다.',
-
+                    message: '상대방에게 가위바위보 게임을 요청합니다.'
                 }));
-
-                requester=this.userName;
                 console.log("게임요청자는",requester,"입니다");
             },
             acceptGameRequest: function() {
