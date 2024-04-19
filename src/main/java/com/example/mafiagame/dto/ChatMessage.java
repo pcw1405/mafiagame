@@ -11,7 +11,7 @@ import lombok.ToString;
 public class ChatMessage {
 
     public enum MessageType{
-        ENTER,QUIT,TALK,GAME_REQUEST_ACCEPT,GAME_REQUEST,GAME_REQUEST_REJECT
+        ENTER,QUIT,TALK,GAME_REQUEST_ACCEPT,GAME_REQUEST,GAME_REQUEST_REJECT,GAME_RESPONSE
     }
 
     @Builder

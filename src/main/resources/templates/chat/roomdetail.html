@@ -95,6 +95,7 @@
                 <button type="button" class="btn btn-primary" @click="sendGameResponse('PAPER')">바위</button>
                 <button type="button" class="btn btn-primary" @click="sendGameResponse('SCISSORS')">보</button>
             </div>
+<!--            gameResponse에 대해서 하나를 선택하고 게임번호 까지 같이 전송한다? -->
 
         </div>
     </div>
@@ -220,6 +221,14 @@
 
                 }
 
+            },
+            sendGameResponse: function(choice) {
+                // 사용자가 선택한 가위, 바위, 보 정보를 서버로 전송합니다.
+                ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
+                    type: 'GAME_RESPONSE',
+                    roomId: this.roomId,
+                    message: choice // 사용자가 선택한 가위, 바위, 보 정보를 전달합니다.
+                }));
             }
         }
 
