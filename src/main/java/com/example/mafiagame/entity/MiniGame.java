@@ -25,4 +25,5 @@ public class MiniGame {
 
     private String winner;
     private String loser;
+    private long draw;
 }

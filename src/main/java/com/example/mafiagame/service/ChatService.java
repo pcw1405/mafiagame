@@ -1,5 +1,6 @@
 package com.example.mafiagame.service;
 
+import com.example.mafiagame.config.SessionManager;
 import com.example.mafiagame.dto.ChatMessage;
 import com.example.mafiagame.entity.MiniGame;
 import com.example.mafiagame.repository.ChatRoomRepository;
@@ -17,6 +18,7 @@ public class ChatService {
     private final RedisTemplate redisTemplate;
     private final ChatRoomRepository chatRoomRepository;
     private final MiniGameRepository miniGameRepository;
+    private final SessionManager sessionManager;
 
 //    destination 정보에서 roomId정보 추출
     public String getRoomId(String destination){
@@ -28,22 +30,28 @@ public class ChatService {
     }
 
 //    오버라이딩
-    public void sendChatMessage(ChatMessage chatMessage, String gameMaker) {
-        String requester =gameMaker;
+    public void sendChatMessage(ChatMessage chatMessage, String request) {
+
         // 두 번째 인자를 활용한 새로운 메서드 구현 내용...
         chatMessage.setUserCount(chatRoomRepository.getUserCount(chatMessage.getRoomId()));
         if (chatMessage.getType().equals(ChatMessage.MessageType.GAME_REQUEST_ACCEPT)){
             chatMessage.setMessage(chatMessage.getSender()+"님이 게임요청을 수락했습니다");
-
-
+            String gameMaker=request;
             MiniGame game = new MiniGame();
             game.setPlayer2(chatMessage.getSender());
             game.setPlayer1(gameMaker);
             miniGameRepository.save(game);
+            long gameId=game.getId();
+            sessionManager.setCurrentGameId(gameMaker, gameId);
             chatMessage.setSender("[시스템]");
+
         }else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_REQUEST)){
             chatMessage.setMessage(chatMessage.getSender()+"님의 게임요청");
             chatMessage.setSender("[시스템]");
+        }else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_RESPONSE)) {
+            String choice=request;
+            chatMessage.setSender("[시스템]");
+            chatMessage.setMessage(chatMessage.getSender() + "님의 게임요청("+choice+")");
         }
         //GAME_REQUEST_ACCEPT
         //GAME_REQUEST_REJECT
@@ -66,6 +74,7 @@ public class ChatService {
         }else if (chatMessage.getType().equals(ChatMessage.MessageType.GAME_RESPONSE)){
 //            chatMessage.setMessage(chatMessage.getSender()+"님이 게임요청을 거절했습니다");
             chatMessage.setSender("[시스템]");
+            chatMessage.setMessage(chatMessage.getSender()+"님이 선택을 했습니다");
         }
             //GAME_REQUEST_ACCEPT
         //GAME_REQUEST_REJECT

@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -27,4 +30,20 @@ public class RedisSubscriber {
 
         }
     }
+
+    public void sendMessage(String publishMessage, String choice) {
+        try {
+            ChatMessage chatMessage = objectMapper.readValue(publishMessage, ChatMessage.class);
+
+//            Map<String, String> additionalData = new HashMap<>();
+//            additionalData.put("choice", choice);
+
+            // 메시지와 함께 choice 데이터도 전송
+            messagingTemplate.convertAndSend("/sub/chat/room/" + chatMessage.getRoomId(), chatMessage);
+        } catch (Exception e) {
+            log.error("Error parsing JSON message: {}", e.getMessage());
+            System.out.println("제이슨파싱에러메시지");
+        }
+    }
+
 }
