@@ -59,6 +59,7 @@ public class ChatController {
     @MessageMapping("/chat/miniGame")
     public void miniGame(ChatMessage message, @Header("token") String token,@Header("request") String request) {
         log.info("miniGame Controller start");
+//        nickname= 현재 로그인한 사람
         String nickname = jwtTokenProvider.getUserNameFromJwt(token);
         // 로그인 회원 정보로 대화명 설정
         message.setSender(nickname);
@@ -83,25 +84,22 @@ public class ChatController {
             chatService.sendChatMessage(message,gameMaker);
 
         } else if (message.getType().equals(ChatMessage.MessageType.GAME_RESPONSE)){
-            log.info("response checkLine ");
             choice=request;
-            log.info("choice: {}", choice);
+            log.info("( response part )  choice: {}", choice);
 
             log.info(" checkLine about session");
             long gameId = gameService.getCurrentGameId(nickname);
-            log.info("(response line) gameId: {}", gameId);
-
+            log.info("(response part) gameId: {}", gameId);
 
             chatService.sendChatMessage(message);
 
-
-            log.info("gameId: {}", gameId);
-            log.info(" checkLine about redis");
             gameService.saveChoice(gameId,nickname ,choice);
 //            chatService.sendChatMessage(message, choice);
 
             String testGetChoice=gameService.getChoice(gameId,nickname);
-            log.info("testGetChoice: {}", testGetChoice);
+            log.info("redisTestGetChoice: {}", testGetChoice);
+
+//            gameId를 매개체로 두 초이스가 있는지 확인을 한다
 
         } else {
             chatService.sendChatMessage(message);
