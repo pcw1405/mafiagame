@@ -6,19 +6,21 @@ import com.example.mafiagame.entity.MiniGame;
 import com.example.mafiagame.repository.ChatRoomRepository;
 import com.example.mafiagame.repository.MiniGameRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class ChatService {
 
     private final ChannelTopic channelTopic;
     private final RedisTemplate redisTemplate;
     private final ChatRoomRepository chatRoomRepository;
     private final MiniGameRepository miniGameRepository;
-    private final SessionManager sessionManager;
+    private final GameService gameService;
 
 //    destination 정보에서 roomId정보 추출
     public String getRoomId(String destination){
@@ -31,7 +33,7 @@ public class ChatService {
 
 //    오버라이딩
     public void sendChatMessage(ChatMessage chatMessage, String request) {
-
+        log.info("sendChatMessage2 start");
         // 두 번째 인자를 활용한 새로운 메서드 구현 내용...
         chatMessage.setUserCount(chatRoomRepository.getUserCount(chatMessage.getRoomId()));
         if (chatMessage.getType().equals(ChatMessage.MessageType.GAME_REQUEST_ACCEPT)){
@@ -42,16 +44,22 @@ public class ChatService {
             game.setPlayer1(gameMaker);
             miniGameRepository.save(game);
             long gameId=game.getId();
-            sessionManager.setCurrentGameId(gameMaker, gameId);
+
+
+//            log.info("chatService session line check");
+                gameService.setCurrentGameId(game.getPlayer1(),gameId);
+            gameService.setCurrentGameId(game.getPlayer2(),gameId);
+            long gameIdCheck = gameService.getCurrentGameId(chatMessage.getSender());
+//            sessionManager.setCurrentGameId(game.getPlayer1(), gameId);
+//            sessionManager.setCurrentGameId(game.getPlayer2(), gameId);
+//            long gameIdCheck = sessionManager.getCurrentGameId(gameMaker);
+            log.info("gamId: {}", gameIdCheck);
+
             chatMessage.setSender("[시스템]");
 
         }else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_REQUEST)){
             chatMessage.setMessage(chatMessage.getSender()+"님의 게임요청");
             chatMessage.setSender("[시스템]");
-        }else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_RESPONSE)) {
-            String choice=request;
-            chatMessage.setSender("[시스템]");
-            chatMessage.setMessage(chatMessage.getSender() + "님의 게임요청("+choice+")");
         }
         //GAME_REQUEST_ACCEPT
         //GAME_REQUEST_REJECT
@@ -72,9 +80,9 @@ public class ChatService {
             chatMessage.setSender("[시스템]");
 
         }else if (chatMessage.getType().equals(ChatMessage.MessageType.GAME_RESPONSE)){
-//            chatMessage.setMessage(chatMessage.getSender()+"님이 게임요청을 거절했습니다");
-            chatMessage.setSender("[시스템]");
             chatMessage.setMessage(chatMessage.getSender()+"님이 선택을 했습니다");
+            chatMessage.setSender("[시스템]");
+
         }
             //GAME_REQUEST_ACCEPT
         //GAME_REQUEST_REJECT

@@ -182,6 +182,23 @@
                 //this.showModal = false;
                 console.log("게임요청자:",this.request);
             },
+            sendGameResponse: function(choice) {
+                // 사용자가 선택한 가위, 바위, 보 정보를 서버로 전송합니다.
+                console.log(choice," 를 냈습니다");
+
+                ws.send("/pub/chat/miniGame", {
+
+                    "token": this.token,
+                     "request": choice
+                },
+                JSON.stringify({
+                    type: 'GAME_RESPONSE',
+                    roomId: this.roomId,
+                    message: '가위바위보 중에 하나를 선택했습니다.'
+                }));
+
+
+            },
             rejectGameRequest: function() {
                 // 모달 닫기 버튼 클릭 시 모달 상태를 변경합니다.
                  ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
@@ -235,21 +252,10 @@
                     this.showModal = false;
 
                 }
+                if (recv.type == 'GAME_RESPONSE') {
+                    console.log('게임리스폰');
 
-            },
-            sendGameResponse: function(choice) {
-                // 사용자가 선택한 가위, 바위, 보 정보를 서버로 전송합니다.
-                console.log(choice," 를 냈습니다");
-
-                ws.send("/pub/chat/miniGame", {
-                    "request": choice,
-                    "token": this.token
-                },
-                JSON.stringify({
-                    type: 'GAME_RESPONSE',
-                    roomId: this.roomId,
-                    message: choice // 사용자가 선택한 가위, 바위, 보 정보를 전달합니다.
-                }));
+                }
 
 
             }

@@ -39,7 +39,7 @@ public class ChatController {
     private final ChatService chatService;
     private final MiniGameRepository miniGameRepository;
     private final GameService gameService;
-    private final SessionManager sessionManager;
+
 
     @MessageMapping("/chat/message")
     public void message(ChatMessage message, @Header("token") String token) {
@@ -58,6 +58,7 @@ public class ChatController {
 
     @MessageMapping("/chat/miniGame")
     public void miniGame(ChatMessage message, @Header("token") String token,@Header("request") String request) {
+        log.info("miniGame Controller start");
         String nickname = jwtTokenProvider.getUserNameFromJwt(token);
         // 로그인 회원 정보로 대화명 설정
         message.setSender(nickname);
@@ -82,13 +83,25 @@ public class ChatController {
             chatService.sendChatMessage(message,gameMaker);
 
         } else if (message.getType().equals(ChatMessage.MessageType.GAME_RESPONSE)){
+            log.info("response checkLine ");
             choice=request;
+            log.info("choice: {}", choice);
 
-            chatService.sendChatMessage(message,choice);
-            long gameId = sessionManager.getCurrentGameId(nickname);
+            log.info(" checkLine about session");
+            long gameId = gameService.getCurrentGameId(nickname);
+            log.info("(response line) gameId: {}", gameId);
 
-            gameService.saveOpponentChoice(gameId,nickname ,choice);
-            chatService.sendChatMessage(message, choice);
+
+            chatService.sendChatMessage(message);
+
+
+            log.info("gameId: {}", gameId);
+            log.info(" checkLine about redis");
+            gameService.saveChoice(gameId,nickname ,choice);
+//            chatService.sendChatMessage(message, choice);
+
+            String testGetChoice=gameService.getChoice(gameId,nickname);
+            log.info("testGetChoice: {}", testGetChoice);
 
         } else {
             chatService.sendChatMessage(message);

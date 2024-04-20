@@ -12,14 +12,28 @@ public class GameService {
     private RedisTemplate<String, String> redisTemplate;
 
     // 상대방의 선택 데이터를 Redis에 저장하는 메서드
-    public void saveOpponentChoice(Long gameId, String nickname, String choice) {
+    public void saveChoice(Long gameId, String nickname, String choice) {
         String redisKey = REDIS_KEY_PREFIX + gameId + ":" + nickname;
         redisTemplate.opsForValue().set(redisKey, choice);
     }
 
     // Redis에서 상대방의 선택 데이터를 가져오는 메서드
-    public String getOpponentChoice(Long gameId, String nickname) {
+    public String getChoice(Long gameId, String nickname) {
         String redisKey = REDIS_KEY_PREFIX + gameId + ":" + nickname;
         return redisTemplate.opsForValue().get(redisKey);
+    }
+
+    public void setCurrentGameId(String userName, long gameId) {
+        String redisKey = "CurrentGameId:" + userName;
+        redisTemplate.opsForValue().set(redisKey, String.valueOf(gameId));
+    }
+
+    public Long getCurrentGameId(String userName) {
+        String redisKey = "CurrentGameId:" + userName;
+        String gameId = redisTemplate.opsForValue().get(redisKey);
+        if (gameId != null) {
+            return Long.parseLong(gameId);
+        }
+        return null;
     }
 }
