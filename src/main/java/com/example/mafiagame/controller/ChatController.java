@@ -6,7 +6,8 @@ import com.example.mafiagame.entity.MiniGame;
 import com.example.mafiagame.repository.ChatRoomRepository;
 import com.example.mafiagame.repository.MiniGameRepository;
 import com.example.mafiagame.service.ChatService;
-import com.example.mafiagame.service.GameServcie;
+
+import com.example.mafiagame.service.GameService;
 import com.example.mafiagame.service.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -37,7 +38,7 @@ public class ChatController {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
     private final MiniGameRepository miniGameRepository;
-    private final GameServcie gameServcie;
+    private final GameService gameService;
     private final SessionManager sessionManager;
 
     @MessageMapping("/chat/message")
@@ -86,7 +87,8 @@ public class ChatController {
             chatService.sendChatMessage(message,choice);
             long gameId = sessionManager.getCurrentGameId(nickname);
 
-            gameServcie.saveOpponentChoice(choice,gameId);
+            gameService.saveOpponentChoice(gameId,nickname ,choice);
+            chatService.sendChatMessage(message, choice);
 
         } else {
             chatService.sendChatMessage(message);
