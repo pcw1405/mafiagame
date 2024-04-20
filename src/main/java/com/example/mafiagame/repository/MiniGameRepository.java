@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MiniGameRepository extends JpaRepository<MiniGame, Long> {
-    MiniGame findByPlayer1OrPlayer2(String player1, String player2);
+    MiniGame findByGameId(Long gameId);
 
 }
