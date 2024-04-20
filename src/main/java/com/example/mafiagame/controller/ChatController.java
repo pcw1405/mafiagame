@@ -99,6 +99,7 @@ public class ChatController {
             String testGetChoice=gameService.getChoice(gameId,nickname);
             log.info("redisTestGetChoice: {}", testGetChoice);
 
+            gameService.determineGameResult(gameId,nickname);
 //            gameId를 매개체로 두 초이스가 있는지 확인을 한다
 
         } else {

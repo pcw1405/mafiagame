@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Log4j2
 public class GameService {
@@ -43,39 +45,52 @@ public class GameService {
         return null;
     }
 
-    public String determineGameResult(Long gameId,String nickName) {
+    public String determineGameResult(Long gameId, String nickName) {
+        Optional<MiniGame> optionalMiniGamePlay = miniGame.findById(gameId);
 
-        MiniGame miniGamePlay=miniGame.findByGameId(gameId);
-        String player1Nickname=miniGamePlay.getPlayer1();
-        String player2Nickname=miniGamePlay.getPlayer2();
+        if (optionalMiniGamePlay.isPresent()) {
+            MiniGame miniGamePlay = optionalMiniGamePlay.get();
 
-        String player1Choice = getChoice(gameId, player1Nickname);
-        String player2Choice = getChoice(gameId, player2Nickname);
+            String player1Nickname = miniGamePlay.getPlayer1();
+            String player2Nickname = miniGamePlay.getPlayer2();
 
-        if (player1Choice == null || player2Choice == null) {
-            // 선택이 모두 이루어지지 않은 경우
-            log.info("아직 선택이 다 이루어지지 않았습니다");
-            return "둘 중 한 명의 선택이 아직 이루어지지 않았습니다.";
-        }
+            String player1Choice = getChoice(gameId, player1Nickname);
+            String player2Choice = getChoice(gameId, player2Nickname);
 
-        if (player1Choice.equals(player2Choice)) {
-            // 비긴 경우
-            return "무승부입니다.";
-        }
+            if (player1Choice == null || player2Choice == null) {
+                // 선택이 모두 이루어지지 않은 경우
+                log.info("아직 선택이 다 이루어지지 않았습니다");
+                return "둘 중 한 명의 선택이 아직 이루어지지 않았습니다.";
+            }
 
-        if ((player1Choice.equals("가위") && player2Choice.equals("보")) ||
-                (player1Choice.equals("바위") && player2Choice.equals("가위")) ||
-                (player1Choice.equals("보") && player2Choice.equals("바위"))) {
-            // player1이 이기는
-            String Winner =player1Nickname;
-            miniGamePlay.setWinner(player2Nickname);
+            String winner;
+            if (player1Choice.equals(player2Choice)) {
+                // 비긴 경우
+                winner = null;
+                miniGamePlay.setWinner(null);
+            } else if ((player1Choice.equals("가위") && player2Choice.equals("보")) ||
+                    (player1Choice.equals("바위") && player2Choice.equals("가위")) ||
+                    (player1Choice.equals("보") && player2Choice.equals("바위"))) {
+                // player1이 이기는 경우
+                winner = player1Nickname;
+                miniGamePlay.setWinner(player1Nickname);
+            } else {
+                // player2가 이기는 경우
+                winner = player2Nickname;
+                miniGamePlay.setWinner(player2Nickname);
+            }
 
-            return player1Nickname + "님이 이겼습니다.";
+            // 게임의 승자를 데이터베이스에 업데이트
+            miniGame.save(miniGamePlay);
+
+            if (winner != null) {
+                return winner + "님이 이겼습니다.";
+            } else {
+                return "무승부입니다.";
+            }
         } else {
-            // player2가 이기는 경우
-            String Winner =player2Nickname;
-            miniGamePlay.setWinner(player1Nickname);
-            return player2Nickname + "님이 이겼습니다.";
+            // 해당 gameId에 대한 게임이 존재하지 않는 경우
+            return "해당 gameId에 대한 게임이 존재하지 않습니다.";
         }
     }
 }
