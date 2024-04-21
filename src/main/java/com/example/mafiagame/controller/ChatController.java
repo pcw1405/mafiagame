@@ -99,9 +99,26 @@ public class ChatController {
             String testGetChoice=gameService.getChoice(gameId,nickname);
             log.info("redisTestGetChoice: {}", testGetChoice);
 
-            gameService.determineGameResult(gameId,nickname);
+            String result =gameService.determineGameResult(gameId,nickname);
 //            gameId를 매개체로 두 초이스가 있는지 확인을 한다
+            if(result=="무승부"){
+                message.setType(ChatMessage.MessageType.GAME_RESULT);
+                message.setMessage("무승부입니다");
+                gameService.clearGameData(gameId);
 
+
+                chatService.sendChatMessage(message,result);
+
+            }else if(result=="선택미완료"){
+                    log.info("선택미완료");
+            }else{
+                message.setType(ChatMessage.MessageType.GAME_RESULT);
+                message.setMessage("축하합니다"+result+"가 기였습니다");
+
+                gameService.clearGameData(gameId);
+
+                chatService.sendChatMessage(message,result);
+            }
         } else {
             chatService.sendChatMessage(message);
         }

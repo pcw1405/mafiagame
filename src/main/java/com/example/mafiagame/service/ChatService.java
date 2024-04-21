@@ -44,7 +44,7 @@ public class ChatService {
             game.setPlayer1(gameMaker);
             miniGameRepository.save(game);
             long gameId=game.getId();
-
+            gameService.clearGameData(gameId);
 
 //            log.info("chatService session line check");
                 gameService.setCurrentGameId(game.getPlayer1(),gameId);
@@ -60,6 +60,9 @@ public class ChatService {
         }else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_REQUEST)){
             chatMessage.setMessage(chatMessage.getSender()+"님의 게임요청");
             chatMessage.setSender("[시스템]");
+        } else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_RESULT)){
+            chatMessage.setSender("[시스템]");
+
         }
         //GAME_REQUEST_ACCEPT
         //GAME_REQUEST_REJECT

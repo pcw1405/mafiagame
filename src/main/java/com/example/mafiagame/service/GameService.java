@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Log4j2
@@ -45,6 +46,24 @@ public class GameService {
         return null;
     }
 
+    public void clearChoice(Long gameId, String nickname) {
+        String redisKey = REDIS_KEY_PREFIX + gameId + ":" + nickname;
+        redisTemplate.delete(redisKey);
+    }
+
+    public void clearCurrentGameId(String userName) {
+        String redisKey = "CurrentGameId:" + userName;
+        redisTemplate.delete(redisKey);
+    }
+
+    public void clearGameData(Long gameId) {
+        Set<String> keys = redisTemplate.keys(REDIS_KEY_PREFIX + gameId + ":*");
+        if (keys != null) {
+            redisTemplate.delete(keys);
+        }
+    }
+
+
     public String determineGameResult(Long gameId, String nickName) {
         Optional<MiniGame> optionalMiniGamePlay = miniGame.findById(gameId);
 
@@ -60,7 +79,7 @@ public class GameService {
             if (player1Choice == null || player2Choice == null) {
                 // 선택이 모두 이루어지지 않은 경우
                 log.info("아직 선택이 다 이루어지지 않았습니다");
-                return "둘 중 한 명의 선택이 아직 이루어지지 않았습니다.";
+                return "선택미완료";
             }
 
             String winner;
@@ -74,19 +93,21 @@ public class GameService {
                 // player1이 이기는 경우
                 winner = player1Nickname;
                 miniGamePlay.setWinner(player1Nickname);
+                miniGamePlay.setLoser(player2Nickname);
             } else {
                 // player2가 이기는 경우
                 winner = player2Nickname;
                 miniGamePlay.setWinner(player2Nickname);
+                miniGamePlay.setLoser(player1Nickname);
             }
 
             // 게임의 승자를 데이터베이스에 업데이트
             miniGame.save(miniGamePlay);
 
             if (winner != null) {
-                return winner + "님이 이겼습니다.";
+                return winner ;
             } else {
-                return "무승부입니다.";
+                return "무승부";
             }
         } else {
             // 해당 gameId에 대한 게임이 존재하지 않는 경우

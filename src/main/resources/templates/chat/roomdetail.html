@@ -256,7 +256,11 @@
                     console.log('게임리스폰');
 
                 }
-
+                if (recv.type == 'GAME_RESULT') {
+                    console.log('게임리스폰');
+                    this.showModal = false;
+                    alert(recv.message);
+                }
 
             }
         }
