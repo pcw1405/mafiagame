@@ -36,10 +36,14 @@ public class StompHandler implements ChannelInterceptor {
 
             log.info("CONNECT {}",jwtToken);
             jwtTokenProvider.validateToken(accessor.getFirstNativeHeader("token"));
+        //
         } else if (StompCommand.SUBSCRIBE==accessor.getCommand()) {
 
             String roomId=chatService.getRoomId(Optional.ofNullable((String) message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
             String sessionId = (String) message.getHeaders().get("simpSessionId");
+
+            // 세션 아이디를 불러온다
+            //왜 굳이 세션아이디를 만드는 것인지 파악해본다
 
             chatRoomRepository.setUserEnterInfo(sessionId,roomId);
             chatRoomRepository.plusUserCount(roomId);
@@ -47,6 +51,7 @@ public class StompHandler implements ChannelInterceptor {
             String name=Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
             chatService.sendChatMessage(ChatMessage.builder().type(ChatMessage.MessageType.ENTER).roomId(roomId).sender(name).build());
             log.info("SUBSCRIBED {}, {}",sessionId,roomId);
+
         } else if (StompCommand.DISCONNECT==accessor.getCommand()) {
 
             String sessionId=(String) message.getHeaders().get("simpSessionId");
