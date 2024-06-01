@@ -62,6 +62,15 @@ public class ChatRoomRepository {
         hashOpsEnterInfo.put(ENTER_INFO,sessionId,roomId);
     }
 
+    //이메일 활용
+    public void setUserEnterInfo(String sessionId,String roomId, String email){
+        // 이메일을 키로 사용하여 roomId를 저장
+        hashOpsEnterInfo.put(ENTER_INFO, email + "_roomId", roomId);
+
+        // 이메일을 키로 사용하여 sessionId를 저장
+        hashOpsEnterInfo.put(ENTER_INFO, email + "_sessionId", sessionId);
+    }
+
     //유저 세션으로 입장해 있는 채팅방 ID 조회
     public String getUserEnterRoomId(String sessionId){
         return hashOpsEnterInfo.get(ENTER_INFO,sessionId);
