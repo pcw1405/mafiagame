@@ -41,9 +41,10 @@ public class StompHandler implements ChannelInterceptor {
 
             String roomId=chatService.getRoomId(Optional.ofNullable((String) message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
             String sessionId = (String) message.getHeaders().get("simpSessionId");
-
+            //simpDestination 헤더는 사용자가 구독하거나 메시지를 전송할 때 대상 경로 (채팅방 ID를 추출할 수 있다)
             // 세션 아이디를 불러온다
             //왜 굳이 세션아이디를 만드는 것인지 파악해본다
+            //세션 ID는 사용자가 웹소켓 연결을 맺을 때 Spring WebSocket 프레임워크에 의해 자동으로 생성된다.
 
             chatRoomRepository.setUserEnterInfo(sessionId,roomId);
             chatRoomRepository.plusUserCount(roomId);

@@ -22,12 +22,10 @@ public class RedisSubscriber {
     public void sendMessage(String publishMessage) {
         try {
             ChatMessage chatMessage = objectMapper.readValue(publishMessage, ChatMessage.class);
-
             messagingTemplate.convertAndSend("/sub/chat/room/" + chatMessage.getRoomId(), chatMessage);
         } catch (Exception e) {
             log.error("Error parsing JSON message: {}", e.getMessage());
             System.out.println("제이슨파싱에러메시지");
-
         }
     }
 
