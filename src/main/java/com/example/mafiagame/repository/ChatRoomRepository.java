@@ -82,6 +82,7 @@ public class ChatRoomRepository {
     }
 
     public List<String> getEmailsByRoomId(String roomId) {
+
         List<String> emails = new ArrayList<>();
 
         // 모든 키를 가져오기
