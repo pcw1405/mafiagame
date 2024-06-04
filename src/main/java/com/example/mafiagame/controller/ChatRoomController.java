@@ -43,6 +43,15 @@ public class ChatRoomController {
             return chatRooms;
     }
 
+    @GetMapping("/emails")
+    @ResponseBody
+    public List<String> emails(String roomId) {
+        List<String> emails=chatRoomRepository.getEmailsByRoomId(roomId);
+        //chatRooms.stream().forEach(room->room.setUserCount(chatRoomRepository.getUserCount(room.getRoomId())));
+        return emails;
+    }
+
+
     @PostMapping("/room")
     @ResponseBody
     public ResponseEntity<?> createRoom(@RequestParam(required = true) String name) {

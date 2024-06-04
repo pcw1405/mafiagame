@@ -56,6 +56,11 @@
         <div class="col-md-6">
             <h4>{{roomName}}  <span class="badge badge-info badge-pill">{{userCount}}</span> </h4>
         </div>
+        <div class="col-md-6">
+            <ul>
+                <li v-for="email in emails" :key="email">{{ email }}</li>
+            </ul>
+        </div>
         <div class="col-md-6 text-right">
             <a class="btn btn-primary btn-sm" href="/logout">로그아웃</a>
             <a class="btn btn-info btn-sm" href="/chat/room">채팅방 나가기</a>
@@ -124,8 +129,8 @@
             showModal: false, // 모달 상태를 저장하는 변수 추가
             showSelect: false,
             userName:{},
-            request:{}
-
+            request:{},
+            emails: [] // 이메일 목록을 저장할 데이터 속성 추가
         },
         created() {
             this.roomId = localStorage.getItem('wschat.roomId');
@@ -145,6 +150,17 @@
                     location.href = "/chat/room";
                 });
             });
+                axios.get('/emails', {
+                  params: {
+                    roomId: this.roomId
+                  }
+                }).then(response => {
+                  this.emails = response.data; // 응답으로 받은 이메일 목록을 데이터 속성에 할당
+                }).catch(error => {
+                  console.error(error);
+                });
+
+
         },
         methods: {
             sendMessage: function(type) {
