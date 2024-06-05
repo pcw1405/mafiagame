@@ -48,16 +48,15 @@ public class StompHandler implements ChannelInterceptor {
             //왜 굳이 세션아이디를 만드는 것인지 파악해본다
             //세션 ID는 사용자가 웹소켓 연결을 맺을 때 Spring WebSocket 프레임워크에 의해 자동으로 생성된다.
 
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String email = auth.getName(); // 사용자 이름 가져오기
-            log.info("현재 사용자: {}", email);
-
             chatRoomRepository.setUserEnterInfo(sessionId,roomId);
-            chatRoomRepository.setUserEnterInfo(sessionId,roomId,email);
+
 
             chatRoomRepository.plusUserCount(roomId);
 
             String name=Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
+            chatRoomRepository.setUserEnterInfo(sessionId,roomId,name);
+            log.info("StompHandler email test {}, {}",name,roomId);
+
             chatService.sendChatMessage(ChatMessage.builder().type(ChatMessage.MessageType.ENTER).roomId(roomId).sender(name).build());
             log.info("SUBSCRIBED {}, {}",sessionId,roomId);
 

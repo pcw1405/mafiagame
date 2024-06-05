@@ -114,10 +114,14 @@ public class ChatRoomRepository {
         hashOpsEnterInfo.delete(ENTER_INFO,sessionId);
     }
 
-    //채팅방 유저수 조회
-    public long getUserCount(String roomId){
-        return Long.valueOf(Optional.ofNullable(valueOps.get(USER_COUNT+"_"+roomId)).orElse("0"));
+    public long getUserCount(String roomId) {
+        List<String> emails = getEmailsByRoomId(roomId);
+        return emails.size();  // 이메일의 수를 반환하여 유저 수를 구함
     }
+    //채팅방 유저수 조회
+//    public long getUserCount(String roomId){
+//        return Long.valueOf(Optional.ofNullable(valueOps.get(USER_COUNT+"_"+roomId)).orElse("0"));
+//    }
 
     // 채팅방에 입장한 유저수 +1
     public long plusUserCount(String roomId){
