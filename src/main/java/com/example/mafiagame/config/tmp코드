@@ -1,0 +1,30 @@
+@Component
+public class JwtTokenProvider {
+
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    private final UserDetailsService userDetailsService;
+
+    public JwtTokenProvider(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
+    // JWT 토큰 검증
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // JWT 토큰에서 인증 정보 추출
+    public Authentication getAuthentication(String token) {
+        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        String username = claims.getSubject();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+}
