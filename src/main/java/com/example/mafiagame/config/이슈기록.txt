@@ -1,0 +1,6 @@
+6월 5일...
+
+다른 컨트롤러에서는 SecurityContextHolder.getContext().getAuthentication()가 잘 동작하는데,
+StompHandler에서만 문제가 발생하는 이유
+
+이유는 WebSocket 연결 처리와 HTTP 요청 처리의 차이 때문에?
