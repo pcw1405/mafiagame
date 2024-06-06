@@ -252,23 +252,31 @@
                 this.userCount = recv.userCount;
                 this.messages.unshift({"type": recv.type, "sender": recv.sender, "message": recv.message})
 
+                let target = recv.target;
+
                 if (recv.type == 'GAME_REQUEST') {
-                    console.log('게임 요청을 받았습니다. 모달을 엽니다');
-                    console.log(this.userName);
 
-                    console.log(recv.message);
-                    const messageParts = recv.message.split('님'); // '-'를 기준으로 분할
-                    console.log(messageParts[0]);
-                    const senderName = messageParts[0];
-                    console.log(senderName);
+                    if(target==this.userName){
+                            console.log('게임 요청을 받았습니다. 모달을 엽니다');
 
-                    if(this.userName!=senderName){
+
+                            console.log(this.userName);
+                            console.log(target);
+
+
+                            console.log(recv.message);
+                            const messageParts = recv.message.split('님'); // '-'를 기준으로 분할
+                            console.log(messageParts[0]);
+                            const senderName = messageParts[0];
+                            console.log(senderName);
+
+
+                            this.request=senderName;
+                            this.showModal = true;
+
+                            console.log(this.showModal);
 
                     }
-                    this.request=senderName;
-                    this.showModal = true;
-
-                    console.log(this.showModal);
                 }
 
                 if (recv.type == 'GAME_REQUEST_ACCEPT') {

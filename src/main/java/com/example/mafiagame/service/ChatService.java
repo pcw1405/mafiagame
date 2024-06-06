@@ -60,6 +60,7 @@ public class ChatService {
         }else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_REQUEST)){
             chatMessage.setMessage(chatMessage.getSender()+"님의 게임요청");
             chatMessage.setSender("[시스템]");
+
         } else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_RESULT)){
             chatMessage.setSender("[시스템]");
 

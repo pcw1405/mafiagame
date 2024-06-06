@@ -50,7 +50,6 @@ public class StompHandler implements ChannelInterceptor {
 
             chatRoomRepository.setUserEnterInfo(sessionId,roomId);
 
-
             chatRoomRepository.plusUserCount(roomId);
 
             String name=Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
