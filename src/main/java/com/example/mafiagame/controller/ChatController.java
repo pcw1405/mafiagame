@@ -57,7 +57,7 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/miniGame")
-    public void miniGame(ChatMessage message, @Header("token") String token,@Header("request") String request) {
+    public void miniGame(ChatMessage message, @Header("token") String token,@Header("request") String request,@Header("receiver") String receiver ) {
         log.info("miniGame Controller start");
 //        nickname= 현재 로그인한 사람
         String nickname = jwtTokenProvider.getUserNameFromJwt(token);

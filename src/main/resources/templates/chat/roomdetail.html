@@ -125,8 +125,10 @@
             message: '',
             messages: [],
             token: '',
+            selectedEmail: null,
             userCount: 0,
             showModal: false, // 모달 상태를 저장하는 변수 추가
+            showEmailModal: false, // 이메일 선택 모달 상태를 저장하는 변수
             showSelect: false,
             userName:{},
             request:{},
@@ -167,19 +169,30 @@
                 ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({type: type, roomId: this.roomId, message: this.message}));
                 this.message = '';
             },
+            showEmailSelectionModal: function() {
+                this.showEmailModal = true; // 이메일 선택 모달을 표시합니다.
+            },
             sendGameRequest: function() {
+                 if (!this.selectedEmail) {
+                    alert("게임 요청을 보낼 사용자를 선택하세요.");
+                    return;
+                }
+
                 // 게임 요청 메시지를 전송합니다.
                 request=this.userName;
                  console.log("게임요청자는",request,"입니다");
                ws.send("/pub/chat/miniGame", {
                     "token": this.token,
-                    "request": this.userName
+                    "request": this.request,
+                     "receiver": this.selectedEmail
                 }, JSON.stringify({
                     type: 'GAME_REQUEST',
                     roomId: this.roomId,
-                    message: '상대방에게 가위바위보 게임을 요청합니다.'
+                     message: `${this.userName}님이 ${this.selectedEmail}님에게 가위바위보 게임을 요청합니다.`
                 }));
-                console.log("게임요청자는",request,"입니다");
+                 this.showEmailModal = false;
+          edEmail, "입니다.");
+                console.log("게임요청자는",request,"입니다");      console.log("게임수락을 받는 사람은", this.select
             },
             acceptGameRequest: function() {
                 // 게임 요청 수락 메시지를 전송합니다.

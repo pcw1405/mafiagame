@@ -1,0 +1,167 @@
+   // websocket & stomp initialize
+    var sock = new SockJS("/ws-stomp");
+    var ws = Stomp.over(sock);
+
+    // vue.js
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            roomId: '',
+            roomName: '',
+            message: '',
+            messages: [],
+            token: '',
+            selectedEmail: null,
+            userCount: 0,
+            showModal: false,
+            showSelect: false,
+            showEmailModal: false, // 이메일 선택 모달 상태를 저장하는 변수
+            userName: {},
+            request: {},
+            emails: [] // 이메일 목록을 저장할 데이터 속성
+        },
+        created() {
+            this.roomId = localStorage.getItem('wschat.roomId');
+            this.roomName = localStorage.getItem('wschat.roomName');
+            var _this = this;
+            axios.get('/chat/user').then(response => {
+                _this.userName = response.data.name;
+                _this.token = response.data.token;
+                ws.connect({"token": _this.token}, function(frame) {
+                    ws.subscribe("/sub/chat/room/" + _this.roomId, function(message) {
+                        var recv = JSON.parse(message.body);
+                        _this.recvMessage(recv);
+                    });
+                }, function(error) {
+                    alert("서버 연결에 실패하였습니다. 다시 접속해 주십시요.");
+                    location.href = "/chat/room";
+                });
+            });
+            axios.get('/chat/emails', {
+                params: {
+                    roomId: this.roomId
+                }
+            }).then(response => {
+                this.emails = response.data; // 응답으로 받은 이메일 목록을 데이터 속성에 할당
+            }).catch(error => {
+                console.error(error);
+            });
+        },
+        methods: {
+            sendMessage: function(type) {
+                ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({type: type, roomId: this.roomId, message: this.message}));
+                this.message = '';
+            },
+            showEmailSelectionModal: function() {
+                this.showEmailModal = true; // 이메일 선택 모달을 표시합니다.
+            },
+            sendGameRequest: function() {
+                if (!this.selectedEmail) {
+                    alert("게임 요청을 보낼 사용자를 선택하세요.");
+                    return;
+                }
+
+                // 게임 요청 메시지를 전송합니다.
+                ws.send("/pub/chat/miniGame", {
+                    "token": this.token,
+                    "request": this.selectedEmail
+                }, JSON.stringify({
+                    type: 'GAME_REQUEST',
+                    roomId: this.roomId,
+                    message: `${this.userName}님이 ${this.selectedEmail}님에게 가위바위보 게임을 요청합니다.`
+                }));
+
+                // 이메일 선택 모달을 닫습니다.
+                this.showEmailModal = false;
+                console.log("게임 요청자는", this.selectedEmail, "입니다.");
+            },
+            acceptGameRequest: function() {
+                // 게임 요청 수락 메시지를 전송합니다.
+                ws.send("/pub/chat/miniGame", {
+                    "token": this.token,
+                    "request": this.request
+                }, JSON.stringify({
+                    type: 'GAME_REQUEST_ACCEPT',
+                    roomId: this.roomId,
+                    message: '가위바위보 게임을 수락합니다.'
+                }));
+
+                // 게임 요청 모달을 닫습니다.
+                this.showModal = false;
+                console.log("게임 요청자:", this.request);
+            },
+            sendGameResponse: function(choice) {
+                // 사용자가 선택한 가위, 바위, 보 정보를 서버로 전송합니다.
+                console.log(choice, "를 냈습니다");
+
+                ws.send("/pub/chat/miniGame", {
+                    "token": this.token,
+                    "request": choice
+                }, JSON.stringify({
+                    type: 'GAME_RESPONSE',
+                    roomId: this.roomId,
+                    message: '가위바위보 중에 하나를 선택했습니다.'
+                }));
+            },
+            rejectGameRequest: function() {
+                // 모달 닫기 버튼 클릭 시 모달 상태를 변경합니다.
+                ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
+                    type: 'GAME_REQUEST_REJECT',
+                    roomId: this.roomId,
+                    message: '가위바위보 게임을 거절합니다.'
+                }));
+                this.showModal = false;
+            },
+            getSenderName() {
+                if (this.messages.length > 0 && this.messages[0].sender) {
+                    const messageParts = this.messages[0].message.split('님');
+                    if (messageParts.length > 0) {
+                        return messageParts[0];
+                    }
+                }
+                return '';
+            },
+            recvMessage: function(recv) {
+                this.userCount = recv.userCount;
+                this.messages.unshift({"type": recv.type, "sender": recv.sender, "message": recv.message});
+
+                if (recv.type == 'GAME_REQUEST') {
+                    console.log('게임 요청을 받았습니다. 모달을 엽니다');
+                    console.log(this.userName);
+
+                    console.log(recv.message);
+                    const messageParts = recv.message.split('님');
+                    const senderName = messageParts[0];
+                    console.log(senderName);
+
+                    if (this.userName != senderName) {
+                        this.request = senderName;
+                        this.showModal = true;
+                    }
+                }
+
+                if (recv.type == 'GAME_REQUEST_ACCEPT') {
+                    console.log('게임을 수락했습니다. 가위바위보를 선택합니다.');
+                    this.showSelect = true;
+                }
+
+                if (recv.type == 'GAME_REQUEST_REJECT') {
+                    console.log('게임 요청을 거절했습니다.');
+                    this.showModal = false;
+                }
+
+                if (recv.type == 'GAME_RESPONSE') {
+                    console.log('게임 응답을 받았습니다.');
+                }
+
+                if (recv.type == 'GAME_RESULT') {
+                    console.log('게임 결과를 받았습니다.');
+                    this.showModal = false;
+                    alert(recv.message);
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>
