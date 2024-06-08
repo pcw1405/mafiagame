@@ -218,6 +218,7 @@
             },
             acceptGameRequest: function() {
                 // 게임 요청 수락 메시지를 전송합니다.
+                  console.log("메시지 타겟대장:",this.selectedEmail);
                 ws.send("/pub/chat/miniGame", {
                     "token": this.token,
                      "request": this.request,
@@ -232,6 +233,7 @@
 
                 // 게임 요청 모달을 닫습니다.
                 //this.showModal = false;
+                 this.showSelect = true;
                 console.log("게임요청자:",this.request);
             },
             sendGameResponse: function(choice) {
@@ -299,22 +301,28 @@
                             this.showModal = true;
 
                             console.log(this.showModal);
-                            this.selectedEmail= recv.target;
+                            this.selectedEmail= senderName;
+                              console.log(recv.sender);
+<!--                              여기서 보내는 사람을 구해야한다 -->
+                                console.log('recv타켓테스트:',recv.target);
                     }
                 }
 
                 if (recv.type == 'GAME_REQUEST_ACCEPT') {
-                    if(target==this.userName || recv.sender==this.userName){
+                    let current_sender=recv.sender;
+                        let current_target=recv.target;
+                    console.log('메세지를 보낸 사람',current_sender);
+                    console.log('메세지를 받는 사람',current_target);
+                    if(current_target==this.userName){
 
                         console.log('게임을 수락했습니다 받았습니다. 가위바위보를 선택합니다.');
-                        let current_sender=recv.sender;
-                        let current_target=recv.target;
-                        console.log('메세지를 보낸 사람',current_sender);
-                        console.log('메세지를 받는 사람',current_target);
+
+
 
                         this.showSelect = true;
 
                     }
+
                 }
                 if (recv.type == 'GAME_REQUEST_REJECT') {
                     console.log('게임요청을 거절했습니다.');

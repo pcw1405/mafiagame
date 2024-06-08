@@ -77,6 +77,7 @@ public class ChatController {
 //        redisTemplate.convertAndSend(channelTopic.getTopic(), message);
         if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST_ACCEPT)){
             gameMaker=request;
+            message.setTarget(target);
             chatService.sendChatMessage(message,gameMaker);
 
         } else if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST)){
