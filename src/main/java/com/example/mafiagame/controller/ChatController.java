@@ -124,7 +124,7 @@ public class ChatController {
 
                 message.setType(ChatMessage.MessageType.GAME_RESULT);
                 // 여기서 메시지를 두번 보낸다 각각에게 이메일을 특정할 수 있다
-                message.setMessage("축하합니다"+result+"가 이겼습니다");
+                message.setMessage("축하합니다"+winner+"가 이겼습니다");
                 message.setTarget(result);
 
                 gameService.clearGameData(gameId);

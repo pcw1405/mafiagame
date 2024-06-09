@@ -341,8 +341,16 @@
                 }
                 if (recv.type == 'GAME_RESULT') {
                     console.log('게임리스폰');
-                    this.showModal = false;
-                    alert(recv.message);
+                    let gameResult=recv.target;
+                    let parts = gameResult.split(',');
+                    let winner = parts[0];
+                    let loser = parts[1];
+
+                    if(winner==this.userName||loser==this.userName){
+                        alert(recv.message);
+                        this.showModal = false;
+                     }
+
                 }
 
             }
