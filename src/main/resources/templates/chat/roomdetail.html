@@ -325,9 +325,15 @@
 
                 }
                 if (recv.type == 'GAME_REQUEST_REJECT') {
-                    console.log('게임요청을 거절했습니다.');
-                    this.showModal = false;
+                    let current_sender=recv.sender;
+                    let current_target=recv.target;
+                    console.log('메세지를 보낸 사람',current_sender);
+                    console.log('메세지를 받는 사람',current_target);
 
+                    if(current_target==this.userName){
+                        console.log('게임요청을 거절했습니다.');
+                        this.showModal = false;
+                     }
                 }
                 if (recv.type == 'GAME_RESPONSE') {
                     console.log('게임리스폰');

@@ -113,13 +113,23 @@ public class ChatController {
 
             }else if(result=="선택미완료"){
                     log.info("선택미완료");
+                    // 여기서
             }else{
+                String[] parts = result.split(",");
+                String winner = parts[0];
+                String loser = parts[1];
+                System.out.println("Winner: " + winner);
+                System.out.println("Loser: " + loser);
+
+
                 message.setType(ChatMessage.MessageType.GAME_RESULT);
-                message.setMessage("축하합니다"+result+"가 기였습니다");
+                // 여기서 메시지를 두번 보낸다 각각에게 이메일을 특정할 수 있다
+                message.setMessage("축하합니다"+result+"가 이겼습니다");
+                message.setTarget(result);
 
                 gameService.clearGameData(gameId);
 
-                chatService.sendChatMessage(message,result);
+                chatService.sendChatMessage(message,winner);
             }
         } else {
             chatService.sendChatMessage(message);

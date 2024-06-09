@@ -83,29 +83,34 @@ public class GameService {
             }
 
             String winner;
+            String loser;
             if (player1Choice.equals(player2Choice)) {
                 // 비긴 경우
                 winner = null;
+                loser = null;
                 miniGamePlay.setWinner(null);
             } else if ((player1Choice.equals("가위") && player2Choice.equals("보")) ||
                     (player1Choice.equals("바위") && player2Choice.equals("가위")) ||
                     (player1Choice.equals("보") && player2Choice.equals("바위"))) {
                 // player1이 이기는 경우
                 winner = player1Nickname;
+                loser = player2Nickname;
                 miniGamePlay.setWinner(player1Nickname);
                 miniGamePlay.setLoser(player2Nickname);
             } else {
                 // player2가 이기는 경우
                 winner = player2Nickname;
+                loser = player1Nickname;
                 miniGamePlay.setWinner(player2Nickname);
                 miniGamePlay.setLoser(player1Nickname);
             }
 
             // 게임의 승자를 데이터베이스에 업데이트
-            miniGame.save(miniGamePlay);
 
+            miniGame.save(miniGamePlay);
+            // 메시지를
             if (winner != null) {
-                return winner ;
+                return winner + "," + loser;
             } else {
                 return "무승부";
             }
