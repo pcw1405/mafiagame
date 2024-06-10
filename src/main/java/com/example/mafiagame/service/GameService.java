@@ -89,18 +89,23 @@ public class GameService {
                 winner = null;
                 loser = null;
                 miniGamePlay.setWinner(null);
-            } else if ((player1Choice.equals("가위") && player2Choice.equals("보")) ||
-                    (player1Choice.equals("바위") && player2Choice.equals("가위")) ||
-                    (player1Choice.equals("보") && player2Choice.equals("바위"))) {
+            } else if ((player1Choice.equals("SCISSORS") && player2Choice.equals("PAPER")) ||
+                    (player1Choice.equals("ROCK") && player2Choice.equals("SCISSORS")) ||
+                    (player1Choice.equals("PAPER") && player2Choice.equals("ROCK"))) {
                 // player1이 이기는 경우
                 winner = player1Nickname;
+                System.out.println("이긴사람은"+winner);
                 loser = player2Nickname;
+                System.out.println("진 사람은"+loser);
                 miniGamePlay.setWinner(player1Nickname);
                 miniGamePlay.setLoser(player2Nickname);
             } else {
                 // player2가 이기는 경우
                 winner = player2Nickname;
+                System.out.println("이긴사람은"+winner);
+
                 loser = player1Nickname;
+                System.out.println("진 사람은"+loser);
                 miniGamePlay.setWinner(player2Nickname);
                 miniGamePlay.setLoser(player1Nickname);
             }
@@ -110,7 +115,7 @@ public class GameService {
             miniGame.save(miniGamePlay);
             // 메시지를
             if (winner != null) {
-                return winner + "," + loser;
+                return winner+","+loser;
             } else {
                 return "무승부";
             }

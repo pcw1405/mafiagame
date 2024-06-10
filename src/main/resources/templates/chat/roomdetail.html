@@ -344,11 +344,15 @@
                     let gameResult=recv.target;
                     let parts = gameResult.split(',');
                     let winner = parts[0];
+                     console.log('위너는',winner);
                     let loser = parts[1];
+                    console.log('루저는',loser);
 
                     if(winner==this.userName||loser==this.userName){
                         alert(recv.message);
                         this.showModal = false;
+                        this.showSelect = false;
+                         this.showEmailModal = false;
                      }
 
                 }

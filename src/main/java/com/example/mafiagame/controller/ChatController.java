@@ -106,10 +106,9 @@ public class ChatController {
             if(result=="무승부"){
                 message.setType(ChatMessage.MessageType.GAME_RESULT);
                 message.setMessage("무승부입니다");
+                chatService.sendChatMessage(message,result);
                 gameService.clearGameData(gameId);
 
-
-                chatService.sendChatMessage(message,result);
 
             }else if(result=="선택미완료"){
                     log.info("선택미완료");
@@ -127,9 +126,11 @@ public class ChatController {
                 message.setMessage("축하합니다"+winner+"가 이겼습니다");
                 message.setTarget(result);
 
+                chatService.sendChatMessage(message,result);
+
                 gameService.clearGameData(gameId);
 
-                chatService.sendChatMessage(message,winner);
+
             }
         } else {
             chatService.sendChatMessage(message);
