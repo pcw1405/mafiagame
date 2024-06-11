@@ -57,14 +57,15 @@ public class ChatService {
 
             chatMessage.setSender("[시스템]");
 
-        }else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_REQUEST)){
-            chatMessage.setMessage(chatMessage.getSender()+"님의 게임요청");
-            chatMessage.setSender("[시스템]");
-
-        } else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_RESULT)){
-            chatMessage.setSender("[시스템]");
-
         }
+//        else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_REQUEST)){
+//            chatMessage.setMessage(chatMessage.getSender()+"님의 게임요청");
+//            chatMessage.setSender("[시스템]");
+//
+//        } else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_RESULT)){
+//            chatMessage.setSender("[시스템]");
+//
+//        }
         //GAME_REQUEST_ACCEPT
         //GAME_REQUEST_REJECT
         redisTemplate.convertAndSend(channelTopic.getTopic(),chatMessage);
@@ -85,6 +86,13 @@ public class ChatService {
 
         }else if (chatMessage.getType().equals(ChatMessage.MessageType.GAME_RESPONSE)){
             chatMessage.setMessage(chatMessage.getSender()+"님이 선택을 했습니다");
+            chatMessage.setSender("[시스템]");
+
+        }else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_REQUEST)){
+            chatMessage.setMessage(chatMessage.getSender()+"님의 게임요청");
+            chatMessage.setSender("[시스템]");
+
+        } else if(chatMessage.getType().equals(ChatMessage.MessageType.GAME_RESULT)){
             chatMessage.setSender("[시스템]");
 
         }

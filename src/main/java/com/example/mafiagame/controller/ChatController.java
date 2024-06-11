@@ -75,11 +75,17 @@ public class ChatController {
         // 채팅방 입장시에는 대화명과 메시지를 자동으로 세팅한다.
         // Websocket에 발행된 메시지를 redis로 발행(publish)
 //        redisTemplate.convertAndSend(channelTopic.getTopic(), message);
-        if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST_ACCEPT)){
-            gameMaker=request;
+        if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST_ACCEPT)) {
+            //gameMaker = request;
             message.setTarget(target);
-            chatService.sendChatMessage(message,gameMaker);
+            chatService.sendChatMessage(message);
 
+        }else if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST_REJECT)){
+               // gameMaker=request;
+                message.setTarget(target);
+                chatService.sendChatMessage(message);
+
+                // if조건을 합쳐야 하지만 왠지 이게 편하고 혹시 뭔가 개별적으로 추가할 것이 필요할지도 모른다
         } else if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST)){
             gameMaker=request;
             message.setTarget(target);
@@ -119,7 +125,6 @@ public class ChatController {
                 String loser = parts[1];
                 System.out.println("Winner: " + winner);
                 System.out.println("Loser: " + loser);
-
 
                 message.setType(ChatMessage.MessageType.GAME_RESULT);
                 // 여기서 메시지를 두번 보낸다 각각에게 이메일을 특정할 수 있다

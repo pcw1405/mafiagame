@@ -254,13 +254,23 @@
 
             },
             rejectGameRequest: function() {
+                console.log("메시지 타겟대장:",this.selectedEmail);
                 // 모달 닫기 버튼 클릭 시 모달 상태를 변경합니다.
-                 ws.send("/pub/chat/message", {"token": this.token}, JSON.stringify({
+                 ws.send("/pub/chat/message", {
+                    "token": this.token,
+                     "request": this.request,
+                     "receiver": this.selectedEmail
+                 },
+                 JSON.stringify({
                     type: 'GAME_REQUEST_REJECT',
                     roomId: this.roomId,
                     message: '가위바위보 게임을 거절합니다.'
                 }));
                 this.showModal = false;
+                this.showSelect = false;
+                this.showEmailModal = false;
+
+
 
             },
                 getSenderName() {
@@ -327,12 +337,14 @@
                 if (recv.type == 'GAME_REQUEST_REJECT') {
                     let current_sender=recv.sender;
                     let current_target=recv.target;
-                    console.log('메세지를 보낸 사람',current_sender);
-                    console.log('메세지를 받는 사람',current_target);
+                    console.log('거절메세지를 보낸 사람',current_sender);
+                    console.log('거절메세지를 받는 사람',current_target);
 
                     if(current_target==this.userName){
-                        console.log('게임요청을 거절했습니다.');
+                        console.log('상대방이 게임요청을 거절했습니다.');
                         this.showModal = false;
+                        this.showSelect = false;
+                        this.showEmailModal = false;
                      }
                 }
                 if (recv.type == 'GAME_RESPONSE') {
