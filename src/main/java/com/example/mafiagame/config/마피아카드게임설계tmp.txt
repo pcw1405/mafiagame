@@ -11,6 +11,7 @@ https://velog.io/@tnals1178/Spring-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC%ED%95%98
 https://velog.io/@wooryung/Spring-Boot-%EC%98%88%EC%99%B8-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
 일단 기본적인 것을 배워서 활용
 
+ 일단 간단하게  NoSuchDataException을 만들어본다
 
 1) 분할과 정복(Divide & Conquer)
 
