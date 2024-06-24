@@ -57,7 +57,8 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/miniGame")
-    public void miniGame(ChatMessage message, @Header("token") String token,@Header("request") String request,@Header(required = false, value = "receiver") String target ) {
+    public void miniGame(ChatMessage message, @Header("token") String token,@Header("request") String request,@Header(required = false, value = "receiver") String target
+    ,@Header(required = false, value = "gameType") String gameType) {
         log.info("miniGame Controller start");
 //        nickname= 현재 로그인한 사람
         String nickname = jwtTokenProvider.getUserNameFromJwt(token);
@@ -78,6 +79,7 @@ public class ChatController {
         if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST_ACCEPT)) {
             //gameMaker = request;
             message.setTarget(target);
+            message.setGameType(gameType);
             chatService.sendChatMessage(message);
 
         }else if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST_REJECT)){
@@ -89,6 +91,7 @@ public class ChatController {
         } else if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST)){
             gameMaker=request;
             message.setTarget(target);
+            message.setGameType(gameType);
             chatService.sendChatMessage(message,gameMaker);
 
         } else if (message.getType().equals(ChatMessage.MessageType.GAME_RESPONSE)){

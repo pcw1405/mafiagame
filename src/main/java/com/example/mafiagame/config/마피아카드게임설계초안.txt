@@ -64,6 +64,15 @@ Player: 플레이어의 역할과 상태
 Item: 아이템의 종류와 효과
 GameState: 게임의 현재 상태
 
+주요 엔드포인트:
+/game/start - 게임 시작
+/game/state - 현재 게임 상태 조회
+/game/vote - 투표 요청
+/game/ability - 능력 사용 요청
+
+사용자 인터페이스 설계
+Thymeleaf를 사용하여 서버 사이드 렌더링 구현
+
 모듈설계
 GameController
 ItemService

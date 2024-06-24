@@ -16,19 +16,21 @@ public class ChatMessage {
     }
 
     @Builder
-    public ChatMessage(MessageType type,String roomId,String sender,String target,String message,long userCount){
+    public ChatMessage(MessageType type,String roomId,String sender,String target,String message,long userCount,String gameType){
         this.type=type;
         this.roomId=roomId;
         this.sender=sender;
         this.message=message;
         this.target = target;
         this.userCount=userCount;
+        this.gameType=gameType;
     }
 
     private MessageType type;
     private String roomId; //방번호
     private String sender; // 메시지 보낸 사람
     private String target;
+    private String gameType;
     private String message; // 메시지
     private long userCount;
 

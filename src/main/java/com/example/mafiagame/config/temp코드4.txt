@@ -1,0 +1,140 @@
+1. 스택 (Stack)
+특성
+LIFO (Last In, First Out): 마지막에 삽입된 요소가 가장 먼저 제거됩니다.
+기본 연산:
+push(): 요소를 스택의 맨 위에 삽입
+pop(): 스택의 맨 위 요소를 제거하고 반환
+peek(): 스택의 맨 위 요소를 제거하지 않고 반환
+isEmpty(): 스택이 비어 있는지 확인
+사용 사례
+게임 상태 관리: 여러 상태 변경을 추적하여 이전 상태로 되돌아갈 수 있게 합니다.
+재귀 알고리즘: 재귀 호출을 스택으로 구현하여 반복문으로 변환할 수 있습니다.
+java
+코드 복사
+import java.util.Stack;
+
+public class GameStateManager {
+    private Stack<GameState> gameStateStack = new Stack<>();
+
+    public void saveState(GameState gameState) {
+        gameStateStack.push(gameState);
+    }
+
+    public GameState restorePreviousState() {
+        if (!gameStateStack.isEmpty()) {
+            return gameStateStack.pop();
+        }
+        return null;
+    }
+
+    public GameState getCurrentState() {
+        return gameStateStack.peek();
+    }
+}
+2. 큐 (Queue)
+특성
+FIFO (First In, First Out): 먼저 삽입된 요소가 가장 먼저 제거됩니다.
+기본 연산:
+offer(): 요소를 큐의 맨 뒤에 삽입
+poll(): 큐의 맨 앞 요소를 제거하고 반환
+peek(): 큐의 맨 앞 요소를 제거하지 않고 반환
+isEmpty(): 큐가 비어 있는지 확인
+사용 사례
+이벤트 처리: 플레이어의 행동, 능력 사용 등의 이벤트를 순서대로 처리
+비동기 작업 큐: 비동기 작업을 순서대로 처리하기 위한 대기열
+java
+코드 복사
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class EventQueue {
+    private Queue<GameEvent> eventQueue = new LinkedList<>();
+
+    public void addEvent(GameEvent event) {
+        eventQueue.offer(event);
+    }
+
+    public GameEvent processNextEvent() {
+        return eventQueue.poll();
+    }
+
+    public boolean isEmpty() {
+        return eventQueue.isEmpty();
+    }
+}
+3. 리스트 (List)
+특성
+순차적으로 데이터를 저장하고 관리
+기본 연산:
+add(): 요소를 리스트에 삽입
+get(): 특정 인덱스의 요소를 반환
+remove(): 특정 인덱스의 요소를 제거
+size(): 리스트의 요소 개수를 반환
+사용 사례
+플레이어 목록: 게임에 참여하는 플레이어들의 목록을 관리
+아이템 목록: 각 플레이어가 소유한 아이템 목록을 관리
+java
+코드 복사
+import java.util.ArrayList;
+import java.util.List;
+
+public class PlayerManager {
+    private List<Player> players = new ArrayList<>();
+
+    public void addPlayer(Player player) {
+        players.add(player);
+    }
+
+    public Player getPlayer(int index) {
+        return players.get(index);
+    }
+
+    public void removePlayer(int index) {
+        players.remove(index);
+    }
+
+    public int getPlayerCount() {
+        return players.size();
+    }
+}
+4. 맵 (Map)
+특성
+키-값 쌍으로 데이터를 저장하고 관리
+기본 연산:
+put(): 키-값 쌍을 맵에 삽입
+get(): 특정 키에 해당하는 값을 반환
+remove(): 특정 키에 해당하는 키-값 쌍을 제거
+containsKey(): 특정 키가 맵에 존재하는지 확인
+사용 사례
+플레이어 데이터: 플레이어 ID를 키로 하여 플레이어 객체를 값으로 저장
+게임 상태: 게임 ID를 키로 하여 게임 상태 객체를 값으로 저장
+java
+코드 복사
+import java.util.HashMap;
+import java.util.Map;
+
+public class PlayerDataManager {
+    private Map<Long, Player> playerDataMap = new HashMap<>();
+
+    public void addPlayer(Long id, Player player) {
+        playerDataMap.put(id, player);
+    }
+
+    public Player getPlayer(Long id) {
+        return playerDataMap.get(id);
+    }
+
+    public void removePlayer(Long id) {
+        playerDataMap.remove(id);
+    }
+
+    public boolean containsPlayer(Long id) {
+        return playerDataMap.containsKey(id);
+    }
+}
+마피아 게임에서의 자료구조 사용 예시
+게임 상태 관리: 스택을 사용하여 게임 상태를 저장하고 필요시 이전 상태로 롤백
+이벤트 처리: 큐를 사용하여 플레이어의 행동 및 능력 사용 이벤트를 순차적으로 처리
+플레이어 및 아이템 관리: 리스트를 사용하여 게임에 참여하는 플레이어와 각 플레이어의 아이템 목록을 관리
+플레이어 데이터: 맵을 사용하여 플레이어 ID와 플레이어 객체를 키-값 쌍으로 저장하여 빠른 조회 가능
+이러한 자료구조를 적절히 사용하여 마피아 게임의 다양한 요구사항을 효율적으로 처리할 수 있습니다.

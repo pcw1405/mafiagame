@@ -1,0 +1,170 @@
+Controller
+
+@RestController
+@RequestMapping("/game")
+public class GameController {
+
+    @Autowired
+    private GameService gameService;
+
+    @PostMapping("/start")
+    public String startGame(@RequestBody List<Player> players) {
+        gameService.startGame(players);
+        return "Game started";
+    }
+
+    @GetMapping("/state")
+    public GameState getGameState() {
+        return gameService.getGameState();
+    }
+
+    @PostMapping("/vote")
+    public String vote(@RequestBody Vote vote) {
+        gameService.processVote(vote);
+        return "Vote processed";
+    }
+
+    @PostMapping("/ability")
+    public String useAbility(@RequestBody AbilityUsage abilityUsage) {
+        gameService.useAbility(abilityUsage);
+        return "Ability used";
+    }
+}
+Services
+
+GameService
+
+
+@Service
+public class GameService {
+
+    @Autowired
+    private PlayerRepository playerRepository;
+
+    @Autowired
+    private GameStateRepository gameStateRepository;
+
+    @Autowired
+    private VoteRepository voteRepository;
+
+    @Autowired
+    private AbilityUsageRepository abilityUsageRepository;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private GameStateService gameStateService;
+
+    public void startGame(List<Player> players) {
+        // Initialize players and game state
+        players.forEach(playerRepository::save);
+        GameState gameState = new GameState("day", players.size(), countMafia(players));
+        gameStateRepository.save(gameState);
+    }
+
+    public GameState getGameState() {
+        return gameStateService.getCurrentGameState();
+    }
+
+    public void processVote(Vote vote) {
+        // Process the vote and update game state if necessary
+        voteRepository.save(vote);
+        gameStateService.updateGameState(calculateNewGameState());
+    }
+
+    public void useAbility(AbilityUsage abilityUsage) {
+        // Process ability usage and update game state if necessary
+        abilityUsageRepository.save(abilityUsage);
+        gameStateService.updateGameState(calculateNewGameState());
+    }
+
+    private int countMafia(List<Player> players) {
+        return (int) players.stream().filter(p -> p.getRole().equals("mafia")).count();
+    }
+
+    private GameState calculateNewGameState() {
+        // Implement logic to calculate and return the new game state
+    }
+}
+PlayerService
+
+
+@Service
+public class PlayerService {
+
+    @Autowired
+    private PlayerRepository playerRepository;
+
+    public Player getPlayer(Long id) {
+        return playerRepository.findById(id).orElse(null);
+    }
+
+    public void savePlayer(Player player) {
+        playerRepository.save(player);
+    }
+}
+ItemService
+
+
+@Service
+public class ItemService {
+
+    @Autowired
+    private ItemRepository itemRepository;
+
+    public Item getItem(Long id) {
+        return itemRepository.findById(id).orElse(null);
+    }
+
+    public void saveItem(Item item) {
+        itemRepository.save(item);
+    }
+}
+GameStateService
+
+
+@Service
+public class GameStateService {
+
+    @Autowired
+    private GameStateRepository gameStateRepository;
+
+    @Cacheable("currentGameState")
+    public GameState getCurrentGameState() {
+        return gameStateRepository.findById(1L).orElse(null); // Assuming there's only one GameState
+    }
+
+    @CachePut("currentGameState")
+    public GameState updateGameState(GameState gameState) {
+        return gameStateRepository.save(gameState);
+    }
+}
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Game State</title>
+</head>
+<body>
+    <h1>Current Game State</h1>
+    <p th:text="'Current Phase: ' + ${gameState.currentPhase}"></p>
+    <p th:text="'Alive Players Count: ' + ${gameState.alivePlayersCount}"></p>
+    <p th:text="'Mafia Count: ' + ${gameState.mafiaCount}"></p>
+</body>
+</html>
+
+@Controller
+@RequestMapping("/game")
+public class GameViewController {
+
+    @Autowired
+    private GameService gameService;
+
+    @GetMapping("/state")
+    public String gameState(Model model) {
+        GameState gameState = gameService.getGameState();
+        model.addAttribute("gameState", gameState);
+        return "gameState";
+    }
+}
