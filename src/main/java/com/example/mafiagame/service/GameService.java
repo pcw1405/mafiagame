@@ -117,11 +117,11 @@ public class GameService {
             if (winner != null) {
                 return winner+","+loser;
             } else {
-                return "무승부";
+                return "draw";
             }
         } else {
             // 해당 gameId에 대한 게임이 존재하지 않는 경우
-            return "해당 gameId에 대한 게임이 존재하지 않습니다.";
+            return "gameId no";
         }
     }
 }

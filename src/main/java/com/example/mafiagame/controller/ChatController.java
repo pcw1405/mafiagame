@@ -77,10 +77,10 @@ public class ChatController {
         // Websocket에 발행된 메시지를 redis로 발행(publish)
 //        redisTemplate.convertAndSend(channelTopic.getTopic(), message);
         if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST_ACCEPT)) {
-            //gameMaker = request;
+            gameMaker = request;
             message.setTarget(target);
             message.setGameType(gameType);
-            chatService.sendChatMessage(message);
+            chatService.sendChatMessage(message,gameMaker);
 
         }else if (message.getType().equals(ChatMessage.MessageType.GAME_REQUEST_REJECT)){
                // gameMaker=request;
@@ -95,7 +95,7 @@ public class ChatController {
             chatService.sendChatMessage(message,gameMaker);
 
         } else if (message.getType().equals(ChatMessage.MessageType.GAME_RESPONSE)){
-            choice=request;
+            choice = request;
             log.info("( response part )  choice: {}", choice);
 
             log.info(" checkLine about session");
@@ -104,52 +104,38 @@ public class ChatController {
 
             chatService.sendChatMessage(message);
 
-            gameService.saveChoice(gameId,nickname ,choice);
-//            chatService.sendChatMessage(message, choice);
-
-            String testGetChoice=gameService.getChoice(gameId,nickname);
+            gameService.saveChoice(gameId, nickname, choice);
+            String testGetChoice = gameService.getChoice(gameId, nickname);
             log.info("redisTestGetChoice: {}", testGetChoice);
 
-            String result =gameService.determineGameResult(gameId,nickname);
-//            gameId를 매개체로 두 초이스가 있는지 확인을 한다
-            if(result=="무승부"){
+            String result = gameService.determineGameResult(gameId, nickname);
+
+            if (result.equals("무승부")) {
                 message.setType(ChatMessage.MessageType.GAME_RESULT);
                 message.setMessage("무승부입니다");
-                chatService.sendChatMessage(message,result);
+                chatService.sendChatMessage(message, result);
                 gameService.clearGameData(gameId);
-
-
-            }else if(result=="선택미완료"){
-                    log.info("선택미완료");
-                    // 여기서
-            }else{
+            } else if (result.equals("선택미완료")) {
+                log.info("선택미완료");
+                // 여기서
+            } else {
                 String[] parts = result.split(",");
                 if (parts.length == 2) {
                     String winner = parts[0];
                     String loser = parts[1];
                     System.out.println("Winner: " + winner);
                     System.out.println("Loser: " + loser);
-                    // 이후 코드
+
+                    message.setType(ChatMessage.MessageType.GAME_RESULT);
+                    message.setMessage("축하합니다 " + winner + "가 이겼습니다");
+                    message.setTarget(result);
+
+                    chatService.sendChatMessage(message, result);
+                    gameService.clearGameData(gameId);
                 } else {
                     // 예외 처리
                     log.error("Unexpected result format: " + result);
                 }
-
-                String winner = parts[0];
-                String loser = parts[1];
-                System.out.println("Winner: " + winner);
-                System.out.println("Loser: " + loser);
-
-                message.setType(ChatMessage.MessageType.GAME_RESULT);
-                // 여기서 메시지를 두번 보낸다 각각에게 이메일을 특정할 수 있다
-                message.setMessage("축하합니다"+winner+"가 이겼습니다");
-                message.setTarget(result);
-
-                chatService.sendChatMessage(message,result);
-
-                gameService.clearGameData(gameId);
-
-
             }
         } else {
             chatService.sendChatMessage(message);
