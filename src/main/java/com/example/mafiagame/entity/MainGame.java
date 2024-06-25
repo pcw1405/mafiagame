@@ -9,11 +9,11 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Table(name="minigame")
+@Table(name="game")
 @Setter
 @ToString
 @NoArgsConstructor
-public class MiniGame implements Game{
+public class MainGame implements Game{
 
     @Id
     @Column(name="game_id")

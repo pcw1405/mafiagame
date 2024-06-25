@@ -101,8 +101,15 @@
         <div class="modal-content">
             <span class="close" @click="showMafiaModal = false">&times;</span>
             <h2>마피아 게임</h2>
-            <p>마피아 게임에 필요한 정보와 컨트롤을 여기에 추가합니다.</p>
-            <!-- 추가적인 마피아 게임 컨텐츠 -->
+            <div v-if="currentRound <= maxRounds">
+                <h3>라운드 {{currentRound}}</h3>
+                <div>
+                    <button v-for="card in playerCards" @click="selectCard(card)">{{card}}</button>
+                </div>
+            </div>
+            <div v-else>
+                <p>게임이 종료되었습니다.</p>
+            </div>
         </div>
     </div>
 
@@ -155,6 +162,9 @@
             showModal: false, // 모달 상태를 저장하는 변수 추가
             showEmailModal: false, // 이메일 선택 모달 상태를 저장하는 변수
             showSelect: false,
+            this.playerCards = ['시민1', '시민2', '시민3', '경찰', '마피아'],
+            currentRound: 1,
+            maxRounds: 5,
             userName:{},
             request:{},
             gameType: '',

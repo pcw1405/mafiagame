@@ -2,6 +2,8 @@ package com.example.mafiagame.service;
 
 import com.example.mafiagame.config.SessionManager;
 import com.example.mafiagame.dto.ChatMessage;
+import com.example.mafiagame.entity.Game;
+import com.example.mafiagame.entity.MainGame;
 import com.example.mafiagame.entity.MiniGame;
 import com.example.mafiagame.repository.ChatRoomRepository;
 import com.example.mafiagame.repository.MiniGameRepository;
@@ -39,10 +41,18 @@ public class ChatService {
         if (chatMessage.getType().equals(ChatMessage.MessageType.GAME_REQUEST_ACCEPT)){
             chatMessage.setMessage(chatMessage.getSender()+"님이 게임요청을 수락했습니다");
             String gameMaker=request;
-            MiniGame game = new MiniGame();
-            game.setPlayer2(chatMessage.getSender());
-            game.setPlayer1(gameMaker);
-            miniGameRepository.save(game);
+
+            Game game;
+
+            if (chatMessage.getGameType().equals("mafia")) {
+                game = gameService.createMainGame(gameMaker, chatMessage.getSender());
+            }else{
+                game = gameService.createMainGame(gameMaker, chatMessage.getSender());
+            }
+
+//            game.setPlayer2(chatMessage.getSender());
+//            game.setPlayer1(gameMaker);
+//            miniGameRepository.save(game);
             long gameId=game.getId();
             gameService.clearGameData(gameId);
 

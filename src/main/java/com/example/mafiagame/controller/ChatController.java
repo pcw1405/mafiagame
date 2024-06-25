@@ -104,7 +104,7 @@ public class ChatController {
 
             chatService.sendChatMessage(message);
 
-            gameService.saveChoice(gameId, nickname, choice);
+            gameService.saveChoice(gameId ,nickname, choice);
             String testGetChoice = gameService.getChoice(gameId, nickname);
             log.info("redisTestGetChoice: {}", testGetChoice);
 

@@ -1,6 +1,8 @@
 package com.example.mafiagame.service;
 
+import com.example.mafiagame.entity.MainGame;
 import com.example.mafiagame.entity.MiniGame;
+import com.example.mafiagame.repository.MainGameRepository;
 import com.example.mafiagame.repository.MiniGameRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,27 @@ public class GameService {
     @Autowired
     private MiniGameRepository miniGame;
     @Autowired
+    private MainGameRepository mainGameRepository;
+
+    @Autowired
+    private MainGame mainGame;
+
+    @Autowired
     private RedisTemplate<String, String> redisTemplate;
+
+    public MainGame createMainGame(String player1, String player2) {
+        MainGame game = new MainGame();
+        game.setPlayer1(player1);
+        game.setPlayer2(player2);
+        return mainGameRepository.save(game);
+    }
+
+    private MiniGame createMiniGame(String player1, String player2) {
+        MiniGame game = new MiniGame();
+        game.setPlayer1(player1);
+        game.setPlayer2(player2);
+        return miniGame.save(game);
+    }
 
     // 상대방의 선택 데이터를 Redis에 저장하는 메서드
     public void saveChoice(Long gameId, String nickname, String choice) {
