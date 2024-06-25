@@ -124,6 +124,17 @@ public class ChatController {
                     // 여기서
             }else{
                 String[] parts = result.split(",");
+                if (parts.length == 2) {
+                    String winner = parts[0];
+                    String loser = parts[1];
+                    System.out.println("Winner: " + winner);
+                    System.out.println("Loser: " + loser);
+                    // 이후 코드
+                } else {
+                    // 예외 처리
+                    log.error("Unexpected result format: " + result);
+                }
+
                 String winner = parts[0];
                 String loser = parts[1];
                 System.out.println("Winner: " + winner);
