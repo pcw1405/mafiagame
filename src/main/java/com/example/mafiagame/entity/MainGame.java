@@ -9,21 +9,22 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Table(name="game")
+@Table(name="minigame")
 @Setter
 @ToString
 @NoArgsConstructor
-public class MainGame implements Game{
+public class MainGame implements Game {
 
     @Id
-    @Column(name="game_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "game_id")
     private Long id;
 
     private String player1;
     private String player2;
-
     private String winner;
     private String loser;
     private long draw;
+
+    // Getters and setters for the fields
 }

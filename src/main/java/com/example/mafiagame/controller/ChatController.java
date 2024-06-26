@@ -110,33 +110,35 @@ public class ChatController {
 
             String result = gameService.determineGameResult(gameId, nickname);
 
-            if (result.equals("무승부")) {
-                message.setType(ChatMessage.MessageType.GAME_RESULT);
-                message.setMessage("무승부입니다");
-                chatService.sendChatMessage(message, result);
-                gameService.clearGameData(gameId);
-            } else if (result.equals("선택미완료")) {
-                log.info("선택미완료");
-                // 여기서
-            } else {
-                String[] parts = result.split(",");
-                if (parts.length == 2) {
-                    String winner = parts[0];
-                    String loser = parts[1];
-                    System.out.println("Winner: " + winner);
-                    System.out.println("Loser: " + loser);
+            gameService.handleGameResult(message, result, gameId);
 
-                    message.setType(ChatMessage.MessageType.GAME_RESULT);
-                    message.setMessage("축하합니다 " + winner + "가 이겼습니다");
-                    message.setTarget(result);
-
-                    chatService.sendChatMessage(message, result);
-                    gameService.clearGameData(gameId);
-                } else {
-                    // 예외 처리
-                    log.error("Unexpected result format: " + result);
-                }
-            }
+//            if (result.equals("무승부")) {
+//                message.setType(ChatMessage.MessageType.GAME_RESULT);
+//                message.setMessage("무승부입니다");
+//                chatService.sendChatMessage(message, result);
+//                gameService.clearGameData(gameId);
+//            } else if (result.equals("선택미완료")) {
+//                log.info("선택미완료");
+//                // 여기서
+//            } else {
+//                String[] parts = result.split(",");
+//                if (parts.length == 2) {
+//                    String winner = parts[0];
+//                    String loser = parts[1];
+//                    System.out.println("Winner: " + winner);
+//                    System.out.println("Loser: " + loser);
+//
+//                    message.setType(ChatMessage.MessageType.GAME_RESULT);
+//                    message.setMessage("축하합니다 " + winner + "가 이겼습니다");
+//                    message.setTarget(result);
+//
+//                    chatService.sendChatMessage(message, result);
+//                    gameService.clearGameData(gameId);
+//                } else {
+//                    // 예외 처리
+//                    log.error("Unexpected result format: " + result);
+//                }
+//            }
         } else {
             chatService.sendChatMessage(message);
         }
