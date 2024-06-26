@@ -23,7 +23,11 @@ public class GameService {
     private final MiniGameRepository miniGameRepository;
     private final MainGameRepository mainGameRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final ChatService chatService;
 
+    public enum Hand {
+        SCISSORS, ROCK, PAPER
+    }
 
     public MainGame createMainGame(String player1, String player2) {
         MainGame game = new MainGame();
@@ -148,7 +152,7 @@ public class GameService {
         if (result.equals("무승부")) {
             message.setType(ChatMessage.MessageType.GAME_RESULT);
             message.setMessage("무승부입니다");
-
+            chatService.sendChatMessage(message, result);
             clearGameData(gameId);
         } else if (result.equals("선택미완료")) {
             log.info("선택미완료");
@@ -163,7 +167,7 @@ public class GameService {
                 message.setType(ChatMessage.MessageType.GAME_RESULT);
                 message.setMessage("축하합니다 " + winner + "가 이겼습니다");
                 message.setTarget(result);
-
+                chatService.sendChatMessage(message, result);
                 clearGameData(gameId);
             } else {
                 log.error("Unexpected result format: " + result);

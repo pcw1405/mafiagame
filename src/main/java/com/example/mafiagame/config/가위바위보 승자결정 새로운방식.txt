@@ -1,0 +1,65 @@
+   // Enums for hand choices and game results
+     public enum Hand {
+         SCISSORS, ROCK, PAPER
+     }
+
+     public enum GameResult {
+         WIN, LOSE, DRAW
+     }
+
+
+ // Method to determine the game result
+    public String determineGameResult(Long gameId, String nickName) {
+        Optional<MiniGame> optionalMiniGamePlay = miniGameRepository.findById(gameId);
+
+        if (optionalMiniGamePlay.isPresent()) {
+            MiniGame miniGamePlay = optionalMiniGamePlay.get();
+
+            String player1Nickname = miniGamePlay.getPlayer1();
+            String player2Nickname = miniGamePlay.getPlayer2();
+
+            Hand player1Choice = getChoice(gameId, player1Nickname);
+            Hand player2Choice = getChoice(gameId, player2Nickname);
+
+            if (player1Choice == null || player2Choice == null) {
+                log.info("아직 선택이 다 이루어지지 않았습니다");
+                return "선택미완료";
+            }
+
+            GameResult result = getResult(player1Choice, player2Choice);
+            String winner;
+            String loser;
+
+            switch (result) {
+                case DRAW:
+                    winner = null;
+                    loser = null;
+                    miniGamePlay.setWinner(null);
+                    break;
+                case WIN:
+                    winner = player1Nickname;
+                    loser = player2Nickname;
+                    miniGamePlay.setWinner(player1Nickname);
+                    miniGamePlay.setLoser(player2Nickname);
+                    break;
+                case LOSE:
+                    winner = player2Nickname;
+                    loser = player1Nickname;
+                    miniGamePlay.setWinner(player2Nickname);
+                    miniGamePlay.setLoser(player1Nickname);
+                    break;
+                default:
+                    return "Unknown result";
+            }
+
+            miniGameRepository.save(miniGamePlay);
+
+            if (winner != null) {
+                return winner + "," + loser;
+            } else {
+                return "draw";
+            }
+        } else {
+            return "gameId no";
+        }
+    }

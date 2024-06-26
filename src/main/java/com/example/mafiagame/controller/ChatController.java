@@ -112,6 +112,8 @@ public class ChatController {
 
             gameService.handleGameResult(message, result, gameId);
 
+
+//          gameService.clearGameData(gameId);
 //            if (result.equals("무승부")) {
 //                message.setType(ChatMessage.MessageType.GAME_RESULT);
 //                message.setMessage("무승부입니다");
