@@ -110,9 +110,19 @@ public class ChatController {
 
             String result = gameService.determineGameResult(gameId, nickname);
 
+            if (message == null) {
+                log.error("Message is null after handling game result");
+                return;
+            }
             message=gameService.handleGameResult(message, result, gameId);
 
+            log.info("testMessage: {}", message);
+
             if(message.getMessage()!="선택미완료"){
+//                if(message.getGameType()=="mafia"){
+//
+//                }
+
                 chatService.sendChatMessage(message, result);
             }
 

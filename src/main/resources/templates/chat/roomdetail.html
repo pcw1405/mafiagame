@@ -103,9 +103,9 @@
             <h2>마피아 게임</h2>
             <div v-if="currentRound <= maxRounds">
                 <h3>라운드 {{currentRound}}</h3>
-                <div>
-                    <button v-for="card in playerCards" @click="selectCard(card)">{{card}}</button>
-                </div>
+                <button type="button" class="btn btn-primary" @click="sendGameResponse('ROCK')">가위</button>
+                <button type="button" class="btn btn-primary" @click="sendGameResponse('PAPER')">바위</button>
+                <button type="button" class="btn btn-primary" @click="sendGameResponse('SCISSORS')">보</button>
             </div>
             <div v-else>
                 <p>게임이 종료되었습니다.</p>
@@ -164,6 +164,7 @@
             showSelect: false,
             playerCards : ['시민1', '시민2', '시민3', '경찰', '마피아'],
             currentRound: 1,
+            choiceCheck: false,
             maxRounds: 5,
             userName:{},
             request:{},
@@ -283,16 +284,25 @@
                       this.showSelect = true;
 
                 } else if (this.gameType === 'mafia') {
-
-                       this.showModal = false;
+                      this.showModal = false;
                        this.showMafiaModal = true; // 마피아 게임 창을 표시합니다.
+
                 }
                 console.log("게임요청자:",this.request);
             },
             sendGameResponse: function(choice) {
+                 if (this.choiceCheck) {
+                    alert("이미 이 라운드에서 선택을 했습니다.");
+                    return;
+                }
+
+                if(this.gameType=='mafia'){
+                    this.choiceCheck=true;
+                }
+
                 // 사용자가 선택한 가위, 바위, 보 정보를 서버로 전송합니다.
                 console.log(choice," 를 냈습니다");
-
+console.log(choice," 를 냈습니다");
                 ws.send("/pub/chat/miniGame", {
 
                     "token": this.token,
@@ -301,7 +311,8 @@
                 JSON.stringify({
                     type: 'GAME_RESPONSE',
                     roomId: this.roomId,
-                    message: '가위바위보 중에 하나를 선택했습니다.'
+                    message: '가위바위보 중에 하나를 선택했습니다.',
+                    gameType: this.gameType
                 }));
 
 
@@ -322,8 +333,6 @@
                 this.showModal = false;
                 this.showSelect = false;
                 this.showEmailModal = false;
-
-
 
             },
                 getSenderName() {
@@ -428,10 +437,25 @@
                     console.log('루저는',loser);
 
                     if(winner==this.userName||loser==this.userName){
-                        alert(recv.message);
-                        this.showModal = false;
-                        this.showSelect = false;
-                         this.showEmailModal = false;
+
+
+                        if(this.gameType=='mafia'){
+                            const MessageByRound = `라운드 ${this.currentRound}: ${recv.message}`;
+                            alert(MessageByRound);
+                            this.currentRound++;
+
+                            if(this.currentRound==5){
+                                 this.showMafiaModal = false;
+                                 this.currentRound=0;
+                            }
+
+                        }else{
+                            alert(recv.message);
+                            this.showModal = false;
+                            this.showSelect = false;
+                            this.showEmailModal = false;
+                        }
+
                      }
 
                 }
