@@ -110,11 +110,19 @@ public class ChatController {
 
             String result = gameService.determineGameResult(gameId, nickname);
 
-            gameService.handleGameResult(message, result, gameId);
+            message=gameService.handleGameResult(message, result, gameId);
+
+            if(message.getMessage()!="선택미완료"){
+                chatService.sendChatMessage(message, result);
+            }
+
+
+//            여기서 게임서비스를 참조한다 -> 게임서비스에서 chat서비스를 참조한다
+            // 가능ㅎ
 
 
 //          gameService.clearGameData(gameId);
-//            if (result.equals("무승부")) {
+//          )   if (result.equals("무승부"){
 //                message.setType(ChatMessage.MessageType.GAME_RESULT);
 //                message.setMessage("무승부입니다");
 //                chatService.sendChatMessage(message, result);

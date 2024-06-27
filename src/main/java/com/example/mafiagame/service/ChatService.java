@@ -44,7 +44,7 @@ public class ChatService {
 
             Game game;
 
-            if (chatMessage.getGameType().equals("mafia")) {
+            if(chatMessage.getGameType().equals("mafia")) {
                 game = gameService.createMainGame(gameMaker, chatMessage.getSender());
             }else{
                 game = gameService.createMainGame(gameMaker, chatMessage.getSender());
