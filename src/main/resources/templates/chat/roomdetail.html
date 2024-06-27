@@ -442,12 +442,16 @@ console.log(choice," 를 냈습니다");
                         if(this.gameType=='mafia'){
                             const MessageByRound = `라운드 ${this.currentRound}: ${recv.message}`;
                             alert(MessageByRound);
-                            this.currentRound++;
+
+
 
                             if(this.currentRound==5){
                                  this.showMafiaModal = false;
                                  this.currentRound=0;
                             }
+
+                            this.currentRound++;
+                            this.choiceCheck=false;
 
                         }else{
                             alert(recv.message);

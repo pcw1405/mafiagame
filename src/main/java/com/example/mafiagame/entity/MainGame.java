@@ -25,6 +25,8 @@ public class MainGame implements Game {
     private String winner;
     private String loser;
     private long draw;
+    private int player1Wins = 0;
+    private int player2Wins = 0;
 
     // Getters and setters for the fields
 }

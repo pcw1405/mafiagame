@@ -86,7 +86,7 @@ public class GameService {
     }
 
 
-    public String determineGameResult(Long gameId, String nickName) {
+    public String determineGameResult(Long gameId, String nickName,String gameType) {
         Optional<MiniGame> optionalMiniGamePlay = miniGameRepository.findById(gameId);
 
         if (optionalMiniGamePlay.isPresent()) {
@@ -119,6 +119,8 @@ public class GameService {
                 System.out.println("이긴사람은"+winner);
                 loser = player2Nickname;
                 System.out.println("진 사람은"+loser);
+
+
                 miniGamePlay.setWinner(player1Nickname);
                 miniGamePlay.setLoser(player2Nickname);
             } else {

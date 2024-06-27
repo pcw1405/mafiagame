@@ -108,7 +108,7 @@ public class ChatController {
             String testGetChoice = gameService.getChoice(gameId, nickname);
             log.info("redisTestGetChoice: {}", testGetChoice);
 
-            String result = gameService.determineGameResult(gameId, nickname);
+            String result = gameService.determineGameResult(gameId, nickname,message.getGameType());
 
             if (message == null) {
                 log.error("Message is null after handling game result");
