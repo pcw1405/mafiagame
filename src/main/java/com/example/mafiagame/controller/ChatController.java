@@ -114,7 +114,7 @@ public class ChatController {
                 log.error("Message is null after handling game result");
                 return;
             }
-            message=gameService.handleGameResult(message, result, gameId);
+//            message=gameService.handleGameResult(message, result, gameId);
 
             log.info("testMessage: {}", message);
 

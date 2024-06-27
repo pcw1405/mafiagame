@@ -1,6 +1,7 @@
 package com.example.mafiagame.service;
 
 import com.example.mafiagame.dto.ChatMessage;
+import com.example.mafiagame.entity.Game;
 import com.example.mafiagame.entity.MainGame;
 import com.example.mafiagame.entity.MiniGame;
 import com.example.mafiagame.repository.MainGameRepository;
@@ -86,66 +87,73 @@ public class GameService {
     }
 
 
-    public String determineGameResult(Long gameId, String nickName,String gameType) {
-        Optional<MiniGame> optionalMiniGamePlay = miniGameRepository.findById(gameId);
-
-        if (optionalMiniGamePlay.isPresent()) {
-            MiniGame miniGamePlay = optionalMiniGamePlay.get();
-
-            String player1Nickname = miniGamePlay.getPlayer1();
-            String player2Nickname = miniGamePlay.getPlayer2();
-
-            String player1Choice = getChoice(gameId, player1Nickname);
-            String player2Choice = getChoice(gameId, player2Nickname);
-
-            if (player1Choice == null || player2Choice == null) {
-                // 선택이 모두 이루어지지 않은 경우
-                log.info("아직 선택이 다 이루어지지 않았습니다");
-                return "선택미완료";
-            }
-
-            String winner;
-            String loser;
-            if (player1Choice.equals(player2Choice)) {
-                // 비긴 경우
-                winner = null;
-                loser = null;
-                miniGamePlay.setWinner(null);
-            } else if ((player1Choice.equals("SCISSORS") && player2Choice.equals("PAPER")) ||
-                    (player1Choice.equals("ROCK") && player2Choice.equals("SCISSORS")) ||
-                    (player1Choice.equals("PAPER") && player2Choice.equals("ROCK"))) {
-                // player1이 이기는 경우
-                winner = player1Nickname;
-                System.out.println("이긴사람은"+winner);
-                loser = player2Nickname;
-                System.out.println("진 사람은"+loser);
-
-
-                miniGamePlay.setWinner(player1Nickname);
-                miniGamePlay.setLoser(player2Nickname);
-            } else {
-                // player2가 이기는 경우
-                winner = player2Nickname;
-                System.out.println("이긴사람은"+winner);
-
-                loser = player1Nickname;
-                System.out.println("진 사람은"+loser);
-                miniGamePlay.setWinner(player2Nickname);
-                miniGamePlay.setLoser(player1Nickname);
-            }
-
-            // 게임의 승자를 데이터베이스에 업데이트
-
-            miniGameRepository.save(miniGamePlay);
-            // 메시지를
-            if (winner != null) {
-                return winner+","+loser;
-            } else {
-                return "draw";
+    public String settingGame(Long gameId, String nickName, String gameType) {
+        if ("mafia".equals(gameType)) {
+            Optional<MainGame> optionalGame = mainGameRepository.findById(gameId);
+            if (optionalGame.isPresent()) {
+                MainGame game = optionalGame.get();
+                return determineGameResult(game, nickName, gameType);
             }
         } else {
-            // 해당 gameId에 대한 게임이 존재하지 않는 경우
-            return "gameId no";
+            Optional<MiniGame> optionalGame = miniGameRepository.findById(gameId);
+            if (optionalGame.isPresent()) {
+                MiniGame game = optionalGame.get();
+                return determineGameResult(game, nickName, gameType);
+            }
+        }
+        return "gameId no";
+    }
+
+    // 나중에 스페셜게임을 추가할 수 도 있으니까 수정하기 쉽게 코드를 작성
+
+    private String determineGameResult(Game game, String nickName, String gameType) {
+        String player1Nickname = game.getPlayer1();
+        String player2Nickname = game.getPlayer2();
+
+        String player1Choice = getChoice(game.getId(), player1Nickname);
+        String player2Choice = getChoice(game.getId(), player2Nickname);
+
+        if (player1Choice == null || player2Choice == null) {
+            log.info("아직 선택이 다 이루어지지 않았습니다");
+            return "선택미완료";
+        }
+
+        String winner;
+        String loser;
+        if (player1Choice.equals(player2Choice)) {
+            winner = null;
+            loser = null;
+            game.setWinner(null);
+        } else if ((player1Choice.equals("SCISSORS") && player2Choice.equals("PAPER")) ||
+                (player1Choice.equals("ROCK") && player2Choice.equals("SCISSORS")) ||
+                (player1Choice.equals("PAPER") && player2Choice.equals("ROCK"))) {
+            winner = player1Nickname;
+            loser = player2Nickname;
+            game.setWinner(player1Nickname);
+            game.setLoser(player2Nickname);
+            if ("mafia".equals(gameType)) {
+                ((MainGame) game).setPlayer1Wins(((MainGame) game).getPlayer1Wins() + 1);
+            }
+        } else {
+            winner = player2Nickname;
+            loser = player1Nickname;
+            game.setWinner(player2Nickname);
+            game.setLoser(player1Nickname);
+            if ("mafia".equals(gameType)) {
+                ((MainGame) game).setPlayer2Wins(((MainGame) game).getPlayer2Wins() + 1);
+            }
+        }
+
+        if ("mafia".equals(gameType)) {
+            mainGameRepository.save((MainGame) game);
+        } else {
+            miniGameRepository.save((MiniGame) game);
+        }
+
+        if (winner != null) {
+            return winner + "," + loser;
+        } else {
+            return "draw";
         }
     }
 
