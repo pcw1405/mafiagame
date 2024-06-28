@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Table(name="minigame")
+@Table(name="maingame")
 @Setter
 @ToString
 @NoArgsConstructor

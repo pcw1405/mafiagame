@@ -36,7 +36,7 @@ public class GameService {
         return mainGameRepository.save(game);
     }
 
-    private MiniGame createMiniGame(String player1, String player2) {
+    public MiniGame createMiniGame(String player1, String player2) {
         MiniGame game = new MiniGame();
         game.setPlayer1(player1);
         game.setPlayer2(player2);
@@ -87,7 +87,7 @@ public class GameService {
     }
 
 
-    public String settingGame(Long gameId, String nickName, String gameType) {
+    public String playingGame(Long gameId, String nickName, String gameType) {
         if ("mafia".equals(gameType)) {
             Optional<MainGame> optionalGame = mainGameRepository.findById(gameId);
             if (optionalGame.isPresent()) {
@@ -129,18 +129,22 @@ public class GameService {
                 (player1Choice.equals("PAPER") && player2Choice.equals("ROCK"))) {
             winner = player1Nickname;
             loser = player2Nickname;
-            game.setWinner(player1Nickname);
-            game.setLoser(player2Nickname);
+
             if ("mafia".equals(gameType)) {
                 ((MainGame) game).setPlayer1Wins(((MainGame) game).getPlayer1Wins() + 1);
+            }else{
+                game.setWinner(player1Nickname);
+                game.setLoser(player2Nickname);
             }
         } else {
             winner = player2Nickname;
             loser = player1Nickname;
-            game.setWinner(player2Nickname);
-            game.setLoser(player1Nickname);
+
             if ("mafia".equals(gameType)) {
                 ((MainGame) game).setPlayer2Wins(((MainGame) game).getPlayer2Wins() + 1);
+            }else{
+                game.setWinner(player2Nickname);
+                game.setLoser(player1Nickname);
             }
         }
 

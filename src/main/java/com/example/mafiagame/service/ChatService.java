@@ -47,17 +47,19 @@ public class ChatService {
             if(chatMessage.getGameType().equals("mafia")) {
                 game = gameService.createMainGame(gameMaker, chatMessage.getSender());
             }else{
-                game = gameService.createMainGame(gameMaker, chatMessage.getSender());
+                game = gameService.createMiniGame(gameMaker, chatMessage.getSender());
             }
 
 //            game.setPlayer2(chatMessage.getSender());
 //            game.setPlayer1(gameMaker);
+
 //            miniGameRepository.save(game);
             long gameId=game.getId();
             gameService.clearGameData(gameId);
 
 //            log.info("chatService session line check");
-                gameService.setCurrentGameId(game.getPlayer1(),gameId);
+//            player1이라기 보단 엔티티 안에서 gamemaker라는 변수가 더 직관적이라 좋지 않을까?
+            gameService.setCurrentGameId(game.getPlayer1(),gameId);
             gameService.setCurrentGameId(game.getPlayer2(),gameId);
             long gameIdCheck = gameService.getCurrentGameId(chatMessage.getSender());
 //            sessionManager.setCurrentGameId(game.getPlayer1(), gameId);
