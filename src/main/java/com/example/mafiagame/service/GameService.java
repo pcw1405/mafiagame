@@ -156,6 +156,24 @@ public class GameService {
         }
 
         if ("mafia".equals(gameType)) {
+            MainGame mainGame = (MainGame) game;
+            int totalRounds = mainGame.getPlayer1Wins() + mainGame.getPlayer2Wins() + (int) mainGame.getDraw();
+            log.info(totalRounds);
+            if (totalRounds >= 5) {
+                if (mainGame.getPlayer1Wins() > mainGame.getPlayer2Wins()) {
+                    mainGame.setTotalWinner(player1Nickname);
+                    mainGame.setTotalLoser(player2Nickname);
+                    return winner + "," + loser+","+"파이널"+","+mainGame.getTotalWinner();
+                }else if (mainGame.getPlayer1Wins() < mainGame.getPlayer2Wins()) {
+                    mainGame.setTotalWinner(player1Nickname);
+                    mainGame.setTotalLoser(player2Nickname);
+                    return winner + "," + loser+","+"파이널"+","+mainGame.getTotalWinner();
+
+                }
+
+
+
+            }
             mainGameRepository.save((MainGame) game);
         } else {
             miniGameRepository.save((MiniGame) game);

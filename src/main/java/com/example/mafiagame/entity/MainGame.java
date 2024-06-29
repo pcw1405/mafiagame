@@ -27,7 +27,8 @@ public class MainGame implements Game {
     private long draw;
     private int player1Wins = 0;
     private int player2Wins = 0;
-
+    private String totalWinner;
+    private String totalLoser;
     @Override
     public Long getId() {
         return id;

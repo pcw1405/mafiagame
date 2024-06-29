@@ -103,9 +103,12 @@
             <h2>마피아 게임</h2>
             <div v-if="currentRound <= maxRounds">
                 <h3>라운드 {{currentRound}}</h3>
-                <button type="button" class="btn btn-primary" @click="sendGameResponse('ROCK')">가위</button>
-                <button type="button" class="btn btn-primary" @click="sendGameResponse('PAPER')">바위</button>
-                <button type="button" class="btn btn-primary" @click="sendGameResponse('SCISSORS')">보</button>
+                <button type="button" class="btn btn-primary" v-show="buttonVisible[0]" @click="sendGameResponse('ROCK', 0)">마피아</button>
+                <button type="button" class="btn btn-primary" v-show="buttonVisible[1]" @click="sendGameResponse('PAPER', 1)">경찰</button>
+                <button type="button" class="btn btn-primary" v-show="buttonVisible[2]" @click="sendGameResponse('SCISSORS', 2)">시민</button>
+                <button type="button" class="btn btn-primary" v-show="buttonVisible[3]" @click="sendGameResponse('SCISSORS', 3)">시민</button>
+                <button type="button" class="btn btn-primary" v-show="buttonVisible[4]" @click="sendGameResponse('SCISSORS', 4)">시민</button>
+
             </div>
             <div v-else>
                 <p>게임이 종료되었습니다.</p>
@@ -162,7 +165,7 @@
             showModal: false, // 모달 상태를 저장하는 변수 추가
             showEmailModal: false, // 이메일 선택 모달 상태를 저장하는 변수
             showSelect: false,
-            playerCards : ['시민1', '시민2', '시민3', '경찰', '마피아'],
+            buttonVisible: [true, true, true, true, true],
             currentRound: 1,
             choiceCheck: false,
             maxRounds: 5,
@@ -290,7 +293,7 @@
                 }
                 console.log("게임요청자:",this.request);
             },
-            sendGameResponse: function(choice) {
+            sendGameResponse: function(choice, index){
                  if (this.choiceCheck) {
                     alert("이미 이 라운드에서 선택을 했습니다.");
                     return;
@@ -299,6 +302,7 @@
                 if(this.gameType=='mafia'){
                     this.choiceCheck=true;
                     console.log(this.gameType,"이 게임타입입니다");
+                    this.buttonVisible[index] = false; // 버튼 숨기기
                 }
 
                 // 사용자가 선택한 가위, 바위, 보 정보를 서버로 전송합니다.
@@ -444,21 +448,24 @@ console.log(choice," 를 냈습니다");
 
                         if(this.gameType=='mafia'){
                             const MessageByRound = `라운드 ${this.currentRound}: ${recv.message}`;
-<!--                             if (parts.length > 2 && parts[2] === "draw") {-->
-<!--                                alert("무승부입니다");-->
-<!--                             }-->
-
 
                             alert(MessageByRound);
 
 
 
+
                             if(this.currentRound==5){
+
+                                 if (parts.length > 2 && parts[2] == "파이널") {
+                                         alert("최종 승자는 " + parts[3] + "입니다.");
+                                 }
+
                                  this.showMafiaModal = false;
                                  this.currentRound=0;
+                                 this.buttonVisible = [true, true, true, true, true];
                             }
 
-                            this.currentRound++;
+                             this.currentRound++;
                             this.choiceCheck=false;
 
                         }else{
