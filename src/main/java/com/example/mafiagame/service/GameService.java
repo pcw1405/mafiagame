@@ -124,6 +124,13 @@ public class GameService {
             winner = null;
             loser = null;
             game.setWinner(null);
+
+            if ("mafia".equals(gameType)) {
+                ((MainGame) game).setDraw(((MainGame) game).getDraw() + 1);
+            } else {
+                ((MiniGame) game).setDraw(((MiniGame) game).getDraw() + 1);
+            }
+
         } else if ((player1Choice.equals("SCISSORS") && player2Choice.equals("PAPER")) ||
                 (player1Choice.equals("ROCK") && player2Choice.equals("SCISSORS")) ||
                 (player1Choice.equals("PAPER") && player2Choice.equals("ROCK"))) {
@@ -157,14 +164,19 @@ public class GameService {
         if (winner != null) {
             return winner + "," + loser;
         } else {
-            return "draw";
+
+            return player1Nickname+","+player2Nickname+","+"draw";
         }
     }
+//    이 코드는 게임 상태의 관리와 게임 데이터 저장 그리고 게임 결과 결정까지 하므로
+    //
 
+//    데이터가 더 늘어날지도 모르니까 json으로?
     public ChatMessage handleGameResult(ChatMessage message, String result, long gameId) {
-        if (result.equals("무승부")) {
+        if (result.contains("draw")) {
             message.setType(ChatMessage.MessageType.GAME_RESULT);
             message.setMessage("무승부입니다");
+            message.setTarget(result);
 //        chatService.sendChatMessage(message, result);
             clearGameData(gameId);
         } else if (result.equals("선택미완료")) {

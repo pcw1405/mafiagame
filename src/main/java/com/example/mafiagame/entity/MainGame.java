@@ -81,4 +81,14 @@ public class MainGame implements Game {
         this.loser = loser;
     }
     // Getters and setters for the fields
+
+    @Override
+    public long getDraw() {
+        return draw;
+    }
+
+    @Override
+    public void setDraw(long draw) {
+        this.draw = draw;
+    }
 }

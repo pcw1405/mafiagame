@@ -9,4 +9,7 @@ public interface Game {
     void setWinner(String winner);
     void setLoser(String loser);
 
+    long getDraw();
+    void setDraw(long draw);
+
 }

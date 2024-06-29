@@ -33,6 +33,17 @@ public class MiniGame implements Game{
     }
 
     @Override
+    public long getDraw() {
+        return draw;
+    }
+
+    @Override
+    public void setDraw(long draw) {
+        this.draw = draw;
+    }
+
+
+    @Override
     public void setPlayer1(String player1) {
         this.player1 = player1;
     }

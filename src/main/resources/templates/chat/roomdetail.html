@@ -431,6 +431,8 @@ console.log(choice," 를 냈습니다");
                 if (recv.type == 'GAME_RESULT') {
                     console.log('게임리스폰');
                     let gameResult=recv.target;
+
+
                     let parts = gameResult.split(',');
                     let winner = parts[0];
                      console.log('위너는',winner);
@@ -442,6 +444,11 @@ console.log(choice," 를 냈습니다");
 
                         if(this.gameType=='mafia'){
                             const MessageByRound = `라운드 ${this.currentRound}: ${recv.message}`;
+<!--                             if (parts.length > 2 && parts[2] === "draw") {-->
+<!--                                alert("무승부입니다");-->
+<!--                             }-->
+
+
                             alert(MessageByRound);
 
 
