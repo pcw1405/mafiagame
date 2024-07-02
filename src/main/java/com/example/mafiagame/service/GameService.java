@@ -218,10 +218,13 @@ public class GameService {
             String[] parts = result.split(",");
             String winner = parts[0];
             String loser = parts[1];
+            if(result.contains("totalDraw")){
+                message.setMessage("축하합니다 " + winner + "가 이겼습니다 최종적으로 무승부입니다");
+                return message;
+            }
             String totalWinner = parts[3];
             message.setMessage("축하합니다 " + winner + "가 이겼습니다 최종적으로"+totalWinner+"가 이겼습니다");
-           if(result.contains("totalDraw")){
-               message.setMessage("축하합니다 " + winner + "가 이겼습니다 최종적으로 무승부입니다");           }
+
 
             message.setTarget(result);
         }else {
