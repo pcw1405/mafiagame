@@ -163,11 +163,22 @@ public class GameService {
                 if (mainGame.getPlayer1Wins() > mainGame.getPlayer2Wins()) {
                     mainGame.setTotalWinner(player1Nickname);
                     mainGame.setTotalLoser(player2Nickname);
-                    return winner + "," + loser+","+"파이널"+","+mainGame.getTotalWinner();
+
+                    if(winner==null && loser==null){
+                        return player1Nickname + "," + player2Nickname+","+"final"+","+mainGame.getTotalWinner();
+                    }
+                    return winner + "," + loser+","+"final"+","+mainGame.getTotalWinner();
                 }else if (mainGame.getPlayer1Wins() < mainGame.getPlayer2Wins()) {
-                    mainGame.setTotalWinner(player1Nickname);
-                    mainGame.setTotalLoser(player2Nickname);
-                    return winner + "," + loser+","+"파이널"+","+mainGame.getTotalWinner();
+                    mainGame.setTotalWinner(player2Nickname);
+                    mainGame.setTotalLoser(player1Nickname);
+                    if(winner==null && loser==null){
+                        return player1Nickname + "," + player2Nickname+","+"final"+","+mainGame.getTotalWinner();
+                    }
+                    return winner + "," + loser+","+"final"+","+mainGame.getTotalWinner();
+                }else{
+                    if(winner==null && loser==null){
+                        return player1Nickname + "," + player2Nickname+","+"final"+","+"totalDraw";
+                    }
 
                 }
 
@@ -194,12 +205,26 @@ public class GameService {
         if (result.contains("draw")) {
             message.setType(ChatMessage.MessageType.GAME_RESULT);
             message.setMessage("무승부입니다");
+            if (result.contains("totalDraw")) {
+                message.setMessage("무승부입니다 최종적으로도 무승부입니다");
+            }
             message.setTarget(result);
 //        chatService.sendChatMessage(message, result);
             clearGameData(gameId);
         } else if (result.equals("선택미완료")) {
             log.info("선택미완료");
-        } else {
+        }  else if (result.contains("final")) {
+            message.setType(ChatMessage.MessageType.GAME_RESULT);
+            String[] parts = result.split(",");
+            String winner = parts[0];
+            String loser = parts[1];
+            String totalWinner = parts[3];
+            message.setMessage("축하합니다 " + winner + "가 이겼습니다 최종적으로"+totalWinner+"가 이겼습니다");
+           if(result.contains("totalDraw")){
+               message.setMessage("축하합니다 " + winner + "가 이겼습니다 최종적으로 무승부입니다");           }
+
+            message.setTarget(result);
+        }else {
             String[] parts = result.split(",");
             if (parts.length == 2) {
                 String winner = parts[0];
