@@ -6,11 +6,13 @@
 
 # 기능
 
-로그인, 좋아요기능 ,채팅방만들기,채팅,가위바위보, 마피아게임
+회원가입기능,로그인,채팅방만들기,채팅,가위바위보, 마피아게임
 
 
 # 화면 
+![회원가입](https://github.com/pcw1405/mafiagame/assets/130324807/05138377-2823-4052-90a0-e4792171d0da)
 
+![채팅방리스트](https://github.com/pcw1405/mafiagame/assets/130324807/613d13eb-9ab1-4310-a5de-cb0ed30d57b3)
 
 ![채팅방](https://github.com/pcw1405/mafiagame/assets/130324807/0c41a09c-7a0f-499c-840b-5dfa58ecaa33)
 
