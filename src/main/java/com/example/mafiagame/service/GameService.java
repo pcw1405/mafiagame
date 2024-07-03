@@ -154,47 +154,51 @@ public class GameService {
                 game.setLoser(player1Nickname);
             }
         }
-
+        String finalMessage = null;
         if ("mafia".equals(gameType)) {
             MainGame mainGame = (MainGame) game;
             int totalRounds = mainGame.getPlayer1Wins() + mainGame.getPlayer2Wins() + (int) mainGame.getDraw();
             log.info(totalRounds);
             if (totalRounds >= 5) {
-                if (mainGame.getPlayer1Wins() > mainGame.getPlayer2Wins()) {
-                    mainGame.setTotalWinner(player1Nickname);
-                    mainGame.setTotalLoser(player2Nickname);
 
-                    if(winner==null && loser==null){
-                        return player1Nickname + "," + player2Nickname+","+"final"+","+mainGame.getTotalWinner();
-                    }
-                    return winner + "," + loser+","+"final"+","+mainGame.getTotalWinner();
-                }else if (mainGame.getPlayer1Wins() < mainGame.getPlayer2Wins()) {
-                    mainGame.setTotalWinner(player2Nickname);
-                    mainGame.setTotalLoser(player1Nickname);
-                    if(winner==null && loser==null){
-                        return player1Nickname + "," + player2Nickname+","+"final"+","+mainGame.getTotalWinner();
-                    }
-                    return winner + "," + loser+","+"final"+","+mainGame.getTotalWinner();
-                }else{
-                    if(winner==null && loser==null){
-                        return player1Nickname + "," + player2Nickname+","+"final"+","+"totalDraw";
-                    }
-
-                }
-
-
-
+                finalMessage = determineFinalWinner(mainGame, player1Nickname, player2Nickname);
             }
+//                if (mainGame.getPlayer1Wins() > mainGame.getPlayer2Wins()) {
+//                    mainGame.setTotalWinner(player1Nickname);
+//                    mainGame.setTotalLoser(player2Nickname);
+//
+//                    if(winner==null && loser==null){
+//                        return player1Nickname + "," + player2Nickname+","+"final"+","+mainGame.getTotalWinner();
+//                    }
+//                    return winner + "," + loser+","+"final"+","+mainGame.getTotalWinner();
+//                }else if (mainGame.getPlayer1Wins() < mainGame.getPlayer2Wins()) {
+//                    mainGame.setTotalWinner(player2Nickname);
+//                    mainGame.setTotalLoser(player1Nickname);
+//                    if(winner==null && loser==null){
+//                        return player1Nickname + "," + player2Nickname+","+"final"+","+mainGame.getTotalWinner();
+//                    }
+//                    return winner + "," + loser+","+"final"+","+mainGame.getTotalWinner();
+//                }else{
+//                    if(winner==null && loser==null){
+//                        return player1Nickname + "," + player2Nickname+","+"totalTie";
+//                    }
+//
+//                }
+//
+//
+//
+
             mainGameRepository.save((MainGame) game);
         } else {
             miniGameRepository.save((MiniGame) game);
         }
 
         if (winner != null) {
-            return winner + "," + loser;
+            return winner + "," + loser+","+finalMessage;
+
         } else {
 
-            return player1Nickname+","+player2Nickname+","+"draw";
+            return player1Nickname+","+player2Nickname+","+finalMessage+","+"draw";
         }
     }
 //    이 코드는 게임 상태의 관리와 게임 데이터 저장 그리고 게임 결과 결정까지 하므로
@@ -205,31 +209,16 @@ public class GameService {
         if (result.contains("draw")) {
             message.setType(ChatMessage.MessageType.GAME_RESULT);
             message.setMessage("무승부입니다");
-            if (result.contains("totalDraw")) {
-                message.setMessage("무승부입니다 최종적으로도 무승부입니다");
-            }
+//            if (result.contains("totalDraw")) {
+//                message.setMessage("무승부입니다 최종적으로도 무승부입니다");
+//            }
             message.setTarget(result);
-//        chatService.sendChatMessage(message, result);
             clearGameData(gameId);
         } else if (result.equals("선택미완료")) {
             log.info("선택미완료");
-        }  else if (result.contains("final")) {
-            message.setType(ChatMessage.MessageType.GAME_RESULT);
+        } else {
             String[] parts = result.split(",");
-            String winner = parts[0];
-            String loser = parts[1];
-            if(result.contains("totalDraw")){
-                message.setMessage("축하합니다 " + winner + "가 이겼습니다 최종적으로 무승부입니다");
-                return message;
-            }
-            String totalWinner = parts[3];
-            message.setMessage("축하합니다 " + winner + "가 이겼습니다 최종적으로"+totalWinner+"가 이겼습니다");
-
-
-            message.setTarget(result);
-        }else {
-            String[] parts = result.split(",");
-            if (parts.length == 2) {
+            if (parts.length >= 2) {
                 String winner = parts[0];
                 String loser = parts[1];
                 log.info("Winner: " + winner);
@@ -238,12 +227,40 @@ public class GameService {
                 message.setType(ChatMessage.MessageType.GAME_RESULT);
                 message.setMessage("축하합니다 " + winner + "가 이겼습니다");
                 message.setTarget(result);
-//              chatService.sendChatMessage(message, result);
                 clearGameData(gameId);
+
             } else {
                 log.error("Unexpected result format: " + result);
             }
         }
+
+        if (result.contains("최종적으로")){
+            String[] parts = result.split(",");
+
+            message.setMessage(message.getMessage() + parts[2]);
+        }
+
+
         return message;
+    }
+
+    private String determineFinalWinner(MainGame mainGame, String player1Nickname, String player2Nickname) {
+        int totalRounds = mainGame.getPlayer1Wins() + mainGame.getPlayer2Wins() + (int) mainGame.getDraw();
+        log.info(totalRounds);
+
+        if (totalRounds == 5) {
+            if (mainGame.getPlayer1Wins() > mainGame.getPlayer2Wins()) {
+                mainGame.setTotalWinner(player1Nickname);
+                mainGame.setTotalLoser(player2Nickname);
+                return "최종적으로" + mainGame.getTotalWinner()+"이 이겼습니다";
+            } else if (mainGame.getPlayer1Wins() < mainGame.getPlayer2Wins()) {
+                mainGame.setTotalWinner(player2Nickname);
+                mainGame.setTotalLoser(player1Nickname);
+                return "최종적으로" + mainGame.getTotalWinner()+"이 이겼습니다.";
+            } else {
+                return "최종적으로 무승부입니다";
+            }
+        }
+        return null;
     }
 }
