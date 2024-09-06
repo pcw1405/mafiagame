@@ -92,17 +92,25 @@ public class GameService {
 
 
     public String playingGame(Long gameId, String nickName, String gameType) {
-        if ("mafia".equals(gameType)) {
-            Optional<MainGame> optionalGame = mainGameRepository.findById(gameId);
-            if (optionalGame.isPresent()) {
-                MainGame game = optionalGame.get();
-                return determineGameResult(game, nickName, gameType);
-            }
-        } else {
-            Optional<MiniGame> optionalGame = miniGameRepository.findById(gameId);
-            if (optionalGame.isPresent()) {
-                MiniGame game = optionalGame.get();
-                return determineGameResult(game, nickName, gameType);
+
+        // 캐시에서 게임 상태 조회
+        Game game = getGameState(gameId, gameType);
+        if (game == null) {
+            // 캐시에 없으므로 데이터베이스에서 조회
+            if ("mafia".equals(gameType)) {
+                Optional<MainGame> optionalGame = mainGameRepository.findById(gameId);
+                if (optionalGame.isPresent()) {
+//                    MainGame game = optionalGame.get();
+                    game = optionalGame.get();
+                    return determineGameResult(game, nickName, gameType);
+                }
+            } else {
+                Optional<MiniGame> optionalGame = miniGameRepository.findById(gameId);
+                if (optionalGame.isPresent()) {
+                    //MiniGame game = optionalGame.get();
+                    game = optionalGame.get();
+                    return determineGameResult(game, nickName, gameType);
+                }
             }
         }
         return "gameId no";
@@ -283,9 +291,12 @@ public class GameService {
         }
     }
 
+    //이 코드도 인터페이스인 game이라는 객체가 있을 때 사용할 수 있는 메서드군
+
 
 
     // 게임 상태를 업데이트하면서 캐시도 함께 업데이트하는 메서드
+    //이것은 게임객체가 주어졌을 때 캐시를 저장할 수 있는 코드
     @CachePut(value = "gameStateCache", key = "#game.id") //@CachePut 어노테이션은 메서드 실행 결과를 캐시에 강제로 저장합니다.
     //value = "gameStateCache"는 해당 캐시의 이름을 지정합니다.
     //key = "#game.id"는 캐시의 키를 game 객체의 id로 지정합니다. 이때 game.getId()를 통해 id를 가져옵니다.
@@ -297,4 +308,8 @@ public class GameService {
             return miniGameRepository.save((MiniGame) game);
         }
     }
+    //부하 감소: 데이터베이스나 외부 API 호출 빈도를 줄여 서버 부하를 낮추고 성능을 개선합니다.
+    //일관성 관리: 자주 변하지 않는 데이터의 경우? 캐시를 사용해 일관된 데이터 제공이 가능합니다.
+    //빠른 접근: 캐시는 메모리에 저장되어 있어 데이터를 빠르게 읽을 수 있으며, 이로 인해 시스템 응답 속도가 빨라집니다.
+    // 이제 이것을 어떻게 활용할 것인가
 }
