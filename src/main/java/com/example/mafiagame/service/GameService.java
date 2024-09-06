@@ -9,6 +9,8 @@ import com.example.mafiagame.repository.MiniGameRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ public class GameService {
     private final MiniGameRepository miniGameRepository;
     private final MainGameRepository mainGameRepository;
     private final RedisTemplate<String, String> redisTemplate;
+
+    private static final String GAME_STATE_CACHE = "GameState:";
 
     public enum Hand {
         SCISSORS, ROCK, PAPER
@@ -262,5 +266,35 @@ public class GameService {
             }
         }
         return null;
+    }
+
+    //게임 상태 캐싱
+    //게임 상태를 조회할 때마다 데이터베이스를 참조하는 대신,
+    // 캐시에 저장된 게임 상태를 사용하여 성능을 향상시킬 수 있습니다.
+    // 게임 상태를 캐싱하여 조회하는 메서드
+    @Cacheable(value = "gameStateCache", key = "#gameId")     //@Cacheable 어노테이션은 메서드의 결과를 캐시합니다.
+    //value = "gameStateCache"는 캐시의 이름을 지정합니다. 이 캐시의 이름은 "gameStateCache"입니다.
+    //key = "#gameId"는 캐시의 키를 gameId로 지정합니다. 즉, gameId를 기준으로 캐시를 저장하고 조회합니다.
+    public Game getGameState(Long gameId, String gameType) {
+        if ("mafia".equals(gameType)) {
+            return mainGameRepository.findById(gameId).orElse(null);
+        } else {
+            return miniGameRepository.findById(gameId).orElse(null);
+        }
+    }
+
+
+
+    // 게임 상태를 업데이트하면서 캐시도 함께 업데이트하는 메서드
+    @CachePut(value = "gameStateCache", key = "#game.id") //@CachePut 어노테이션은 메서드 실행 결과를 캐시에 강제로 저장합니다.
+    //value = "gameStateCache"는 해당 캐시의 이름을 지정합니다.
+    //key = "#game.id"는 캐시의 키를 game 객체의 id로 지정합니다. 이때 game.getId()를 통해 id를 가져옵니다.
+    public Game updateGameState(Game game) {
+        if (game instanceof MainGame) {
+            return mainGameRepository.save((MainGame) game);
+            //게임의 객체 자체를 저장한다
+        } else {
+            return miniGameRepository.save((MiniGame) game);
+        }
     }
 }
