@@ -115,6 +115,7 @@ public class GameService {
         }
         return "gameId no";
     }
+    // 이 코드는 게임결과를 가져오기 위한 코드
 
     // 나중에 스페셜게임을 추가할 수 도 있으니까 수정하기 쉽게 코드를 작성
 
@@ -200,10 +201,13 @@ public class GameService {
 //
 //
 
-            mainGameRepository.save((MainGame) game);
+//            mainGameRepository.save((MainGame) game);
         } else {
-            miniGameRepository.save((MiniGame) game);
+//            miniGameRepository.save((MiniGame) game);
+            //updateGameState가 있으니까 굳이 필요없는 코드일수도 있다
         }
+
+        updateGameState(game);
 
         if (winner != null) {
             return winner + "," + loser+","+finalMessage;
