@@ -92,27 +92,40 @@ public class GameService {
 
 
     public String playingGame(Long gameId, String nickName, String gameType) {
+        log.info("Starting game with gameId: {}, nickName: {}, gameType: {}", gameId, nickName, gameType);
 
         // 캐시에서 게임 상태 조회
         Game game = getGameState(gameId, gameType);
         if (game == null) {
+            log.info("Game not found in cache, checking database...");
+
             // 캐시에 없으므로 데이터베이스에서 조회
             if ("mafia".equals(gameType)) {
                 Optional<MainGame> optionalGame = mainGameRepository.findById(gameId);
                 if (optionalGame.isPresent()) {
-//                    MainGame game = optionalGame.get();
                     game = optionalGame.get();
+                    log.info("Game found in database for mafia gameType with gameId: {}", gameId);
                     return determineGameResult(game, nickName, gameType);
+                } else {
+                    log.error("Game with gameId {} not found in MainGame database", gameId);
                 }
             } else {
                 Optional<MiniGame> optionalGame = miniGameRepository.findById(gameId);
                 if (optionalGame.isPresent()) {
-                    //MiniGame game = optionalGame.get();
                     game = optionalGame.get();
+                    log.info("Game found in database for mini gameType with gameId: {}", gameId);
                     return determineGameResult(game, nickName, gameType);
+                } else {
+                    log.error("Game with gameId {} not found in MiniGame database", gameId);
                 }
             }
+        } else {
+            log.info("Game found in cache for gameId: {}", gameId);
+
+            return determineGameResult(game, nickName, gameType);
+
         }
+
         return "gameId no";
     }
     // 이 코드는 게임결과를 가져오기 위한 코드
@@ -129,6 +142,9 @@ public class GameService {
         if (player1Choice == null || player2Choice == null) {
             log.info("아직 선택이 다 이루어지지 않았습니다");
             return "선택미완료";
+        }else{
+            log.info("player1 ({}) 선택: {}", player1Nickname, player1Choice);
+            log.info("player2 ({}) 선택: {}", player2Nickname, player2Choice);
         }
 
         String winner;
@@ -201,13 +217,13 @@ public class GameService {
 //
 //
 
-//            mainGameRepository.save((MainGame) game);
+            mainGameRepository.save((MainGame) game);
         } else {
-//            miniGameRepository.save((MiniGame) game);
+            miniGameRepository.save((MiniGame) game);
             //updateGameState가 있으니까 굳이 필요없는 코드일수도 있다
         }
 
-        updateGameState(game);
+          updateGameState(game);
 
         if (winner != null) {
             return winner + "," + loser+","+finalMessage;

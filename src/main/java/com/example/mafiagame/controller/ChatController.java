@@ -109,11 +109,12 @@ public class ChatController {
             log.info("redisTestGetChoice: {}", testGetChoice);
 
             String result = gameService.playingGame(gameId, nickname,message.getGameType());
-
+            log.info("playingGameResult: {}", result);
             if (message == null) {
                 log.error("Message is null after handling game result");
                 return;
             }
+
             message=gameService.handleGameResult(message, result, gameId);
 
             log.info("testMessage: {}", message);
