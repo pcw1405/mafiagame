@@ -9,6 +9,7 @@ import com.example.mafiagame.repository.MiniGameRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -141,6 +142,7 @@ public class GameService {
 
         if (player1Choice == null || player2Choice == null) {
             log.info("아직 선택이 다 이루어지지 않았습니다");
+            log.info("Both players have not made their selections yet");
             return "선택미완료";
         }else{
             log.info("player1 ({}) 선택: {}", player1Nickname, player1Choice);
@@ -226,10 +228,11 @@ public class GameService {
           updateGameState(game);
 
         if (winner != null) {
+            evictGameState(game.getId());
             return winner + "," + loser+","+finalMessage;
 
         } else {
-
+            evictGameState(game.getId());
             return player1Nickname+","+player2Nickname+","+finalMessage+","+"draw";
         }
     }
@@ -284,12 +287,15 @@ public class GameService {
             if (mainGame.getPlayer1Wins() > mainGame.getPlayer2Wins()) {
                 mainGame.setTotalWinner(player1Nickname);
                 mainGame.setTotalLoser(player2Nickname);
+                evictGameState(mainGame.getId());
                 return "최종적으로" + mainGame.getTotalWinner()+"이 이겼습니다";
             } else if (mainGame.getPlayer1Wins() < mainGame.getPlayer2Wins()) {
                 mainGame.setTotalWinner(player2Nickname);
                 mainGame.setTotalLoser(player1Nickname);
+                evictGameState(mainGame.getId());
                 return "최종적으로" + mainGame.getTotalWinner()+"이 이겼습니다.";
             } else {
+                evictGameState(mainGame.getId());
                 return "최종적으로 무승부입니다";
             }
         }
@@ -321,6 +327,7 @@ public class GameService {
     //value = "gameStateCache"는 해당 캐시의 이름을 지정합니다.
     //key = "#game.id"는 캐시의 키를 game 객체의 id로 지정합니다. 이때 game.getId()를 통해 id를 가져옵니다.
     public Game updateGameState(Game game) {
+
         if (game instanceof MainGame) {
             return mainGameRepository.save((MainGame) game);
             //게임의 객체 자체를 저장한다
@@ -328,6 +335,19 @@ public class GameService {
             return miniGameRepository.save((MiniGame) game);
         }
     }
+
+    @CacheEvict(value = "gameStateCache", allEntries = true)
+    public void evictAllGameStates() {
+        // 캐시의 모든 항목을 제거
+        log.info("All game states have been evicted from the cache.");
+    }
+
+    @CacheEvict(value = "gameStateCache", key = "#gameId")
+    public void evictGameState(Long gameId) {
+        // 캐시에서 gameId에 해당하는 항목을 제거
+        log.info("Game state with gameId {} has been evicted from the cache.", gameId);
+    }
+
     //부하 감소: 데이터베이스나 외부 API 호출 빈도를 줄여 서버 부하를 낮추고 성능을 개선합니다.
     //일관성 관리: 자주 변하지 않는 데이터의 경우? 캐시를 사용해 일관된 데이터 제공이 가능합니다.
     //빠른 접근: 캐시는 메모리에 저장되어 있어 데이터를 빠르게 읽을 수 있으며, 이로 인해 시스템 응답 속도가 빨라집니다.

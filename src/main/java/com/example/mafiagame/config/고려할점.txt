@@ -11,3 +11,7 @@ Native Query,Native Query개선
 redis 메모리 사용량 체크?
 
 heroku 포트폴리오 무료ssl도 자동으로?
+
+가위바위보를 할 때 시간제한
+
+스크롤에 보이는 창만 먼저 보이도록 하기
