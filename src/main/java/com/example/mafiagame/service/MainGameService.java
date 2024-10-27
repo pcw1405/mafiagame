@@ -5,7 +5,6 @@ import com.example.mafiagame.repository.MainGameRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-//MDC는 각 요청마다 고유한 식별자를 부여함으로써 로그를 추적하는 데 큰 도움이 됩니다
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,7 @@ public class MainGameService {
             Optional<MainGame> optionalMainGame = mainGameRepository.findById(mainGameId);
 
             if (optionalMainGame.isEmpty()) {
-                throw new MainGameNotFoundException("Main game not found with ID: " + mainGameId);
+                throw new MainGameNotFoundException(mainGameId);
             }
 
             MainGame mainGame = optionalMainGame.get();
@@ -43,7 +42,7 @@ public class MainGameService {
             } else if (mainGame.getPlayer2().equals(playerNickname)) {
                 mainGame.setPlayer2Wins(mainGame.getPlayer2Wins() + 1);
             } else {
-                throw new InvalidPlayerException("Player nickname not found: " + playerNickname);
+                throw new InvalidPlayerException(playerNickname);
             }
 
             mainGameRepository.save(mainGame);
@@ -60,22 +59,23 @@ public class MainGameService {
 
     public MainGame getMainGame(Long mainGameId) {
         return mainGameRepository.findById(mainGameId)
-                .orElseThrow(() -> new MainGameNotFoundException("Invalid main game ID: " + mainGameId));
+                .orElseThrow(() -> new MainGameNotFoundException(mainGameId));
     }
 }
 
 // 사용자 정의 예외
 @ResponseStatus(HttpStatus.NOT_FOUND)
 class MainGameNotFoundException extends RuntimeException {
-    public MainGameNotFoundException(String message) {
-        super(message);
+    public MainGameNotFoundException(Long mainGameId) {
+        super("Main game not found with ID: " + mainGameId);
     }
 }
-//사용자 정의 예외를 사용하면 애플리케이션에서 발생할 수 있는 특정 상황을 더욱 구체적으로 처리할 수 있습니다.
 
+// 사용자 정의 예외
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class InvalidPlayerException extends RuntimeException {
-    public InvalidPlayerException(String message) {
-        super(message);
+    public InvalidPlayerException(String playerNickname) {
+        super("Player nickname not found: " + playerNickname);
     }
 }
+
