@@ -22,7 +22,6 @@ public class MainGameService {
     private MainGameRepository mainGameRepository;
 
     public void incrementPlayerWins(Long mainGameId, String playerNickname, String gameType) {
-        // 요청별 고유 UUID 생성 후 MDC에 추가
         String requestId = UUID.randomUUID().toString();
         MDC.put("requestId", requestId);
 
@@ -52,7 +51,6 @@ public class MainGameService {
             logger.error("Error occurred: {}, requestId: {}", e.getMessage(), requestId);
             throw e;
         } finally {
-            // 요청 완료 후 MDC 초기화
             MDC.clear();
         }
     }
